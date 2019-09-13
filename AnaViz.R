@@ -272,6 +272,7 @@ server <- function(input, output, session) {
 
       }
     
+    
     return(distribPlot)
   })
  
