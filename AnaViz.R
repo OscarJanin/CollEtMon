@@ -3,12 +3,8 @@ library(leaflet)
 library(leaflet.extras)
 library(tidyverse)
 
-T0New <- readRDS("C:/Users/Oscar/Desktop/Coll&Mon/Projet R/T0New.Rds")
-T0Impl <- readRDS("C:/Users/Oscar/Desktop/Coll&Mon/Projet R/T0impl.Rds")
-
-
-write_csv(T0New, "C:/Users/Oscar/Desktop/Coll&Mon/Projet R/T0New.csv")
-write_csv(T0Impl, "C:/Users/Oscar/Desktop/Coll&Mon/Projet R/T0Impl.csv")
+T0New <- readRDS("T0New.Rds")
+T0Impl <- readRDS("T0impl.Rds")
 
 #liste input
 listObs <- list("Coutumiers",
