@@ -2,8 +2,24 @@ library(shiny)
 library(leaflet)
 library(leaflet.extras)
 library(tidyverse)
+library(sf)
+# 
+# ChefLieu <- readOGR("Diocese/chefs_lieux_diocèse_1317L93.shp", encoding = "system")
+# ChefLieu <- st_as_sf(ChefLieu)
+# ChefLieu <- st_as_sf( ChefLieu, coords = c("long", "lat") ) %>%
+#   st_set_crs( 2154 ) %>%   #set coordinate system used
+#   st_transform( 4326 )     #transform coordinates to WGS84 coordinates
+# ChefLieu <- ChefLieu %>%
+#   mutate(long = unlist(map(ChefLieu$geometry,1)),
+#          lat = unlist(map(ChefLieu$geometry,2)))
+# write_rds(ChefLieu,"ChefLieu1317.Rds")
 
-T0New <- readRDS("T0New.Rds")
+ChefLieu1317 <- readRDS("ChefLieu1317.Rds")
+
+Diocese1317 <- readRDS("Diocese1317.Rds")
+
+
+T0New <- readRDS("T0New.Rds"  )
 T0Impl <- readRDS("T0impl.Rds")
 
 #liste input
@@ -78,8 +94,8 @@ ui <- fluidPage(
     
     # Main panel for displaying outputs ----
     mainPanel(width = 9,
-      leafletOutput("map", height = "50vh"),
-      plotOutput("distribPlot", height = "47vh",
+      leafletOutput("map", height = "60vh"),
+      plotOutput("distribPlot", height = "37vh",
                  brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE))
     )
   )
@@ -184,55 +200,115 @@ server <- function(input, output, session) {
     
     T0New <- points()
     
-    leaflet(data = T0New) %>% 
+    leaflet()%>%
+      addLayersControl(
+        position = "bottomright",
+        overlayGroups = c("Diocèse", "Chefs lieux de Diocèse"),
+        options = layersControlOptions(collapsed = F)
+      ) %>% 
+      addMapPane("PaneDiocese", zIndex = 410) %>%  # Level 1
+      addMapPane("PaneT0NewBlack", zIndex = 420) %>%  # Level 2
+      addMapPane("PaneT0New", zIndex = 430) %>%  # Level 3
+      addMapPane("PaneChefsLieux", zIndex = 440) %>%  # Level 4
+      hideGroup("Diocèse") %>% 
+      hideGroup("Chefs lieux de Diocèse") %>% 
       addProviderTiles(providers$CartoDB.Positron) %>% 
       addCircleMarkers(
+        data = T0New,
         radius = 4,
         color = 'red',
         stroke = FALSE,
         fillOpacity = 1,
-        popup = ~paste("Nom : ", usual_name)
+        popup = ~paste("Nom : ", usual_name),
+        group = 'reactive',
+        options = pathOptions(pane = "PaneT0New")
       )%>%
+      addPolygons(
+        data = st_transform(Diocese1317, crs = 4326),
+        stroke = TRUE,
+        weight = 1,
+        opacity = 1,
+        color = "grey",
+        fill= FALSE,
+        fillColor = "grey",
+        fillOpacity = 0,
+        group = "Diocèse",
+        options = pathOptions(pane = "PaneDiocese")
+      )%>% 
+      addCircleMarkers(
+        data = ChefLieu1317,
+        lat = ChefLieu1317$lat,
+        lng = ChefLieu1317$long,
+        radius = 5,
+        color = 'blue',
+        stroke = FALSE,
+        fillOpacity = 1,
+        popup = ~paste("Nom : ", Nom_Commun),
+        group = "Chefs lieux de Diocèse",
+        options = pathOptions(pane = "PaneChefsLieux")
+      )%>% 
       addDrawToolbar(polylineOptions = FALSE, polygonOptions = FALSE, circleOptions = FALSE,
                      markerOptions = FALSE, singleFeature = TRUE, circleMarkerOptions = FALSE,
-                     editOptions = editToolbarOptions(edit = FALSE, remove = TRUE))
+                     editOptions = editToolbarOptions(edit = FALSE, remove = TRUE)
+                     )
   })
   
   observe({
     if(length(filteredGraphData()) > 1){
       T0New <- points()
-      mapData <- filteredGraphData() 
-      mapProxy <- leafletProxy("map", session = session, data = c(mapData, T0New))
-      mapProxy %>% 
-        clearMarkers()  %>%
+      mapData <- filteredGraphData()
+      mapProxy <- leafletProxy("map", session = session)
+      mapProxy %>%
+        clearGroup('reactive') %>% 
         addCircleMarkers(
+          data = T0New,
           lat = T0New$lat,
           lng = T0New$lng,
           radius = 1,
           color = 'black',
           stroke = FALSE,
-          fillOpacity = 1
+          fillOpacity = 1,
+          group = 'reactive',
+          options = pathOptions(pane = "PaneT0NewBlack")
         ) %>%
         addCircleMarkers(
+          data = mapData,
           lat = mapData$lat,
           lng = mapData$lng,
           radius = 4,
           color = 'red',
           stroke = FALSE,
           fillOpacity = 1,
-          popup = ~paste("Nom : ", usual_name)
+          popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
+                         "<strong>Diocèse :</strong>", Diocese,"</br>",
+                         "<strong>D1 :</strong>", date_start_min,"</br>",
+                         "<strong>D2 :</strong>", date_start_max,"</br>",
+                         "<strong>D3 :</strong>", date_stop_min,"</br>",
+                         "<strong>D4 :</strong>", date_stop_max),
+          group = 'reactive',
+          options = pathOptions(pane = "PaneT0New")
         )
     } else {
       mapData <- points()
-      mapProxy <- leafletProxy("map", session = session, data = mapData)
-      mapProxy %>% 
-        clearMarkers() %>%
+      mapProxy <- leafletProxy("map", session = session)
+      mapProxy %>%
+        clearGroup('reactive') %>% 
         addCircleMarkers(
+          data = mapData,
+          lat = mapData$lat,
+          lng = mapData$lng,
           radius = 4,
           color = 'red',
           stroke = FALSE,
           fillOpacity = 1,
-          popup = ~paste("<strong>Nom :</strong>", usual_name)
+          popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
+                         "<strong>Diocèse :</strong>", Diocese,"</br>",
+                         "<strong>D1 :</strong>", date_start_min,"</br>",
+                         "<strong>D2 :</strong>", date_start_max,"</br>",
+                         "<strong>D3 :</strong>", date_stop_min,"</br>",
+                         "<strong>D4 :</strong>", date_stop_max),
+          group = 'reactive',
+          options = pathOptions(pane = "PaneT0New")
         )
     }
   })
@@ -242,29 +318,37 @@ server <- function(input, output, session) {
     
     T0New <- points()
     
-    # distribData <- T0New %>% 
-    #   group_by(date_start_min) %>% 
-    #   summarise(Nb = n()) %>% 
-    #   mutate(Freq = Nb / sum(Nb)) %>% 
-    #   na.omit()
-    # 
-    # distribPlot <- ggplot(distribData, aes(date_start_min, Freq)) +
-    #   geom_col(fill = "#43a2ca", alpha = .35, col = "#053144",width = 0.9)+
-    #   theme_minimal()
-    
     distribPlot <- ggplot(T0New,aes(date_start_min)) +
       geom_density(col = "#053144", fill = "#43a2ca", alpha = 0.3, adjust = 0.75)
     
-      
-      if(length(filteredSpatialData())> 1){
+    
+      if(!is.null(nrow(filteredSpatialData())) && nrow(filteredSpatialData())> 1){
+
+        print(nrow(filteredSpatialData()))
+        
         mapSeldistribData <- filteredSpatialData() %>%
           group_by(date_start_min) %>%
           summarise(Nb = n()) %>%
-          mutate(Freq = Nb / sum(Nb)) %>%
-          na.omit()
+          mutate(Freq = Nb / sum(Nb))
+        
+        rangeY <- layer_scales(distribPlot)$y$range$range[2]
 
         distribPlot <- distribPlot +
-          geom_col(data = mapSeldistribData, aes(date_start_min, Freq),fill = "#43a2ca", alpha = .35, col = "red", width = 0.9)
+          geom_density(data = mapSeldistribData, aes(date_start_min),col = "red", fill = "red", alpha = 0.3, adjust = 0.75)
+         }
+    if(!is.null(nrow(filteredSpatialData())) && nrow(filteredSpatialData())==1){
+      
+        print(nrow(filteredSpatialData()))
+
+        mapSeldistribData <- filteredSpatialData() %>%
+          group_by(date_start_min) %>%
+          summarise(Nb = n()) %>%
+          mutate(Freq = Nb / sum(Nb))
+
+        rangeY <- layer_scales(distribPlot)$y$range$range[2]
+
+        distribPlot <- distribPlot +
+          geom_col(data = mapSeldistribData, aes(date_start_min, rangeY),fill = "red", alpha = 0.3, col = "red", width = 1)
 
       }
     
