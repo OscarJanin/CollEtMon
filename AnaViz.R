@@ -34,9 +34,9 @@ listOrdr <- list("Bénédictins",
                  "Clercs réguliers")
 
 listStat <- list("Régulier",
-                  "Séculier",
-                  "Séculier communautaire",
-                  "Autre")
+                 "Séculier",
+                 "Séculier communautaire",
+                 "Autre")
 
 listEcol <- list("École dépendante",
                  "École capitulaire",
@@ -49,11 +49,29 @@ listComm <- list("Masculine",
 ui <- fluidPage(
   
   tags$head(tags$style(".checkbox{
-                       margin-top:2px;
-                       margin-bottom:2px
-  }"
+                        margin-top:2px;
+                        margin-bottom:2px
+                       }
+                       .marker-cluster {
+	                      background-color: #ff000000 !important;
+                        color: white;
+                       }
+                       
+                       .marker-cluster div {
+                        margin-left: 10px !important;
+                        margin-top: 10px !important;
+                        background-color: #E53030 !important;
+                        color: white;
+                        width: 15px !important;
+                        height: 15px !important;
+                        font: 12px Arial !important;
+                       }
+                       .marker-cluster span {
+                           line-height: 17px !important;
+                       }
+                       "
   )),
-
+  
   # Sidebar layout with input and output definitions ----
   sidebarLayout( 
     position = "right",
@@ -94,12 +112,12 @@ ui <- fluidPage(
     
     # Main panel for displaying outputs ----
     mainPanel(width = 9,
-      leafletOutput("map", height = "60vh"),
-      plotOutput("distribPlot", height = "37vh",
-                 brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE))
+              leafletOutput("map", height = "60vh"),
+              plotOutput("distribPlot", height = "37vh",
+                         brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE))
     )
   )
-)
+  )
 
 
 server <- function(input, output, session) {
@@ -113,7 +131,7 @@ server <- function(input, output, session) {
       selected = if (input$Obs) listObs
     )
   })
-
+  
   observe({
     updateCheckboxGroupInput(
       session,
@@ -122,7 +140,7 @@ server <- function(input, output, session) {
       selected = if (input$Ordr) listOrdr
     )
   })
-
+  
   observe({
     updateCheckboxGroupInput(
       session,
@@ -131,7 +149,7 @@ server <- function(input, output, session) {
       selected = if (input$Stat) listStat
     )
   })
-
+  
   observe({
     updateCheckboxGroupInput(
       session,
@@ -140,7 +158,7 @@ server <- function(input, output, session) {
       selected = if (input$Ecol) listEcol
     )
   })
-
+  
   observe({
     updateCheckboxGroupInput(
       session,
@@ -154,17 +172,17 @@ server <- function(input, output, session) {
   #filtrer les points par les input (carac et modalités)
   points <- reactive({
     temp <- select(T0New, lng, lat)
-      temp <- filter(T0New, modAgreg %in% c(input$Obsc,
-                                            input$Ordrc,
-                                            input$Statc,
-                                            input$Ecolc,
-                                            input$Commc))
+    temp <- filter(T0New, modAgreg %in% c(input$Obsc,
+                                          input$Ordrc,
+                                          input$Statc,
+                                          input$Ecolc,
+                                          input$Commc))
     temp
   })
   
   #filtrer les données par attribut du graphique
   filteredGraphData <- reactive({
-
+    
     noSelection <- TRUE
     currentlyFiltered <- points()
     
@@ -193,7 +211,7 @@ server <- function(input, output, session) {
     }
   })
   
-
+  
   
   #Sortie map
   output$map <- renderLeaflet({
@@ -213,16 +231,6 @@ server <- function(input, output, session) {
       hideGroup("Diocèse") %>% 
       hideGroup("Chefs lieux de Diocèse") %>% 
       addProviderTiles(providers$CartoDB.Positron) %>% 
-      addCircleMarkers(
-        data = T0New,
-        radius = 4,
-        color = 'red',
-        stroke = FALSE,
-        fillOpacity = 1,
-        popup = ~paste("Nom : ", usual_name),
-        group = 'reactive',
-        options = pathOptions(pane = "PaneT0New")
-      )%>%
       addPolygons(
         data = st_transform(Diocese1317, crs = 4326),
         stroke = TRUE,
@@ -250,7 +258,7 @@ server <- function(input, output, session) {
       addDrawToolbar(polylineOptions = FALSE, polygonOptions = FALSE, circleOptions = FALSE,
                      markerOptions = FALSE, singleFeature = TRUE, circleMarkerOptions = FALSE,
                      editOptions = editToolbarOptions(edit = FALSE, remove = TRUE)
-                     )
+      )
   })
   
   observe({
@@ -271,14 +279,11 @@ server <- function(input, output, session) {
           group = 'reactive',
           options = pathOptions(pane = "PaneT0NewBlack")
         ) %>%
-        addCircleMarkers(
+        addMarkers(
           data = mapData,
           lat = mapData$lat,
           lng = mapData$lng,
-          radius = 4,
-          color = 'red',
-          stroke = FALSE,
-          fillOpacity = 1,
+          icon = makeIcon(iconUrl = "icones/T0New.png",iconWidth = 10,iconHeight = 10),
           popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
                          "<strong>Diocèse :</strong>", Diocese,"</br>",
                          "<strong>D1 :</strong>", date_start_min,"</br>",
@@ -286,21 +291,21 @@ server <- function(input, output, session) {
                          "<strong>D3 :</strong>", date_stop_min,"</br>",
                          "<strong>D4 :</strong>", date_stop_max),
           group = 'reactive',
-          options = pathOptions(pane = "PaneT0New")
+          options = pathOptions(pane = "PaneT0New"),
+            clusterOptions = markerClusterOptions(maxClusterRadius =0, 
+                                                  clusterPane= 'PaneT0New'
+                                                  )
         )
     } else {
       mapData <- points()
       mapProxy <- leafletProxy("map", session = session)
       mapProxy %>%
         clearGroup('reactive') %>% 
-        addCircleMarkers(
+        addMarkers(
           data = mapData,
           lat = mapData$lat,
           lng = mapData$lng,
-          radius = 4,
-          color = 'red',
-          stroke = FALSE,
-          fillOpacity = 1,
+          icon = makeIcon(iconUrl = "icones/T0New.png",iconWidth = 10,iconHeight = 10),
           popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
                          "<strong>Diocèse :</strong>", Diocese,"</br>",
                          "<strong>D1 :</strong>", date_start_min,"</br>",
@@ -308,7 +313,10 @@ server <- function(input, output, session) {
                          "<strong>D3 :</strong>", date_stop_min,"</br>",
                          "<strong>D4 :</strong>", date_stop_max),
           group = 'reactive',
-          options = pathOptions(pane = "PaneT0New")
+          options = pathOptions(pane = "PaneT0New"),
+          clusterOptions = markerClusterOptions(maxClusterRadius =0, 
+                                                clusterPane= 'PaneT0New'
+                                                )
         )
     }
   })
@@ -322,40 +330,40 @@ server <- function(input, output, session) {
       geom_density(col = "#053144", fill = "#43a2ca", alpha = 0.3, adjust = 0.75)
     
     
-      if(!is.null(nrow(filteredSpatialData())) && nrow(filteredSpatialData())> 1){
-
-        print(nrow(filteredSpatialData()))
-        
-        mapSeldistribData <- filteredSpatialData() %>%
-          group_by(date_start_min) %>%
-          summarise(Nb = n()) %>%
-          mutate(Freq = Nb / sum(Nb))
-        
-        rangeY <- layer_scales(distribPlot)$y$range$range[2]
-
-        distribPlot <- distribPlot +
-          geom_density(data = mapSeldistribData, aes(date_start_min),col = "red", fill = "red", alpha = 0.3, adjust = 0.75)
-         }
+    if(!is.null(nrow(filteredSpatialData())) && nrow(filteredSpatialData())> 1){
+      
+      print(nrow(filteredSpatialData()))
+      
+      mapSeldistribData <- filteredSpatialData() %>%
+        group_by(date_start_min) %>%
+        summarise(Nb = n()) %>%
+        mutate(Freq = Nb / sum(Nb))
+      
+      rangeY <- layer_scales(distribPlot)$y$range$range[2]
+      
+      distribPlot <- distribPlot +
+        geom_density(data = mapSeldistribData, aes(date_start_min),col = "red", fill = "red", alpha = 0.3, adjust = 0.75)
+    }
     if(!is.null(nrow(filteredSpatialData())) && nrow(filteredSpatialData())==1){
       
-        print(nrow(filteredSpatialData()))
-
-        mapSeldistribData <- filteredSpatialData() %>%
-          group_by(date_start_min) %>%
-          summarise(Nb = n()) %>%
-          mutate(Freq = Nb / sum(Nb))
-
-        rangeY <- layer_scales(distribPlot)$y$range$range[2]
-
-        distribPlot <- distribPlot +
-          geom_col(data = mapSeldistribData, aes(date_start_min, rangeY),fill = "red", alpha = 0.3, col = "red", width = 1)
-
-      }
+      print(nrow(filteredSpatialData()))
+      
+      mapSeldistribData <- filteredSpatialData() %>%
+        group_by(date_start_min) %>%
+        summarise(Nb = n()) %>%
+        mutate(Freq = Nb / sum(Nb))
+      
+      rangeY <- layer_scales(distribPlot)$y$range$range[2]
+      
+      distribPlot <- distribPlot +
+        geom_col(data = mapSeldistribData, aes(date_start_min, rangeY),fill = "red", alpha = 0.3, col = "red", width = 1)
+      
+    }
     
     
     return(distribPlot)
   })
- 
+  
 }
 
 # Create Shiny app ----
