@@ -19,7 +19,7 @@ ChefLieu1317 <- readRDS("ChefLieu1317.Rds")
 Diocese1317 <- readRDS("Diocese1317.Rds")
 
 
-T0New <- readRDS("T0New.Rds"  )
+T0New <- readRDS("T0New.Rds")
 
 #liste input
 listObs <- list("Coutumiers",
@@ -214,19 +214,18 @@ server <- function(input, output, session) {
   
   #Sortie map
   output$map <- renderLeaflet({
-    
-    T0New <- points()
-    
+
     leaflet()%>%
       addLayersControl(
         position = "bottomright",
-        overlayGroups = c("Diocèse", "Chefs lieux de Diocèse"),
+        overlayGroups = c("Diocèse", "Chefs lieux de Diocèse","hors-selection" ),
         options = layersControlOptions(collapsed = F)
       ) %>% 
       addMapPane("PaneDiocese", zIndex = 410) %>%  # Level 1
       addMapPane("PaneT0NewBlack", zIndex = 420) %>%  # Level 2
       addMapPane("PaneT0New", zIndex = 430) %>%  # Level 3
-      addMapPane("PaneChefsLieux", zIndex = 440) %>%  # Level 4
+      addMapPane("PaneClusterT0New", zIndex = 440) %>%  # Level 4
+      addMapPane("PaneChefsLieux", zIndex = 450) %>%  # Level 5
       hideGroup("Diocèse") %>% 
       hideGroup("Chefs lieux de Diocèse") %>% 
       addProviderTiles(providers$CartoDB.Positron) %>% 
@@ -267,6 +266,7 @@ server <- function(input, output, session) {
       mapProxy <- leafletProxy("map", session = session)
       mapProxy %>%
         clearGroup('reactive') %>% 
+        clearGroup('hors-selection') %>% 
         addCircleMarkers(
           data = T0New,
           lat = T0New$lat,
@@ -275,7 +275,7 @@ server <- function(input, output, session) {
           color = 'black',
           stroke = FALSE,
           fillOpacity = 1,
-          group = 'reactive',
+          group = 'hors-selection',
           options = pathOptions(pane = "PaneT0NewBlack")
         ) %>%
         addMarkers(
@@ -292,7 +292,7 @@ server <- function(input, output, session) {
           group = 'reactive',
           options = pathOptions(pane = "PaneT0New"),
             clusterOptions = markerClusterOptions(maxClusterRadius =0, 
-                                                  clusterPane= 'PaneT0New'
+                                                  clusterPane= 'PaneClusterT0New'
                                                   )
         )
     } else {
@@ -300,6 +300,7 @@ server <- function(input, output, session) {
       mapProxy <- leafletProxy("map", session = session)
       mapProxy %>%
         clearGroup('reactive') %>% 
+        clearGroup('hors-selection') %>% 
         addMarkers(
           data = mapData,
           lat = mapData$lat,
@@ -314,7 +315,7 @@ server <- function(input, output, session) {
           group = 'reactive',
           options = pathOptions(pane = "PaneT0New"),
           clusterOptions = markerClusterOptions(maxClusterRadius =0, 
-                                                clusterPane= 'PaneT0New'
+                                                clusterPane= 'PaneClusterT0New'
                                                 )
         )
     }
