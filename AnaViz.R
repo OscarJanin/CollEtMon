@@ -3,7 +3,9 @@ library(leaflet)
 library(leaflet.extras)
 library(tidyverse)
 library(sf)
-# 
+
+
+# nouveau commit
 # ChefLieu <- readOGR("Diocese/chefs_lieux_diocèse_1317L93.shp", encoding = "system")
 # ChefLieu <- st_as_sf(ChefLieu)
 # ChefLieu <- st_as_sf( ChefLieu, coords = c("long", "lat") ) %>%
