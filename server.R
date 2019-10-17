@@ -42,7 +42,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  #filtrer les factoides par fenêtre spatiale ----
+  #filtrer les factoides par fenÃªtre spatiale ----
   filteredSpatialData <- reactive({
     
     currentlyFilteredMap <- points()
@@ -72,10 +72,39 @@ shinyServer(function(input, output, session) {
     return(LiensAfficheF)
   })
   
-  #filtrer les lignes par le graphique ----
+  #filtrer les liens par le graphique ----
   filteredGraphLines <- reactive({
     
     currentlyFiltered <- lignes()
+    
+    if(!is.null(input$distribPlot_brush)){
+      thisSel <- input$distribPlot_brush
+      currentlyFiltered <- currentlyFiltered %>% 
+        filter(date_start_min >= thisSel$xmin, date_start_min <= thisSel$xmax)
+    }
+    return(currentlyFiltered)
+  })
+  
+  #filtrer les ecoles par les input ----
+  ecole <- reactive({
+    ecoleSel <- filter(Ecole, modAgreg == input$Ecolc)
+    
+    idImplSel <- unique(ecoleSel$idimplantation)
+    ecoleFiltre <- filter(Ecole, idimplantation %in% idImplSel)
+    if(input$etat == "État final"){
+      ecoleAfficheF <- ecoleFiltre %>%  group_by(idimplantation) %>%  filter(date_stop_max == max(date_stop_max))
+    }else if(input$etat == "État initial"){
+      ecoleAfficheF <- ecoleFiltre %>%  group_by(idimplantation) %>%  filter(date_start_min == min(date_start_min))
+    }else if(input$etat == "État dominant"){
+      ecoleAfficheF <- ecoleFiltre %>%  group_by(idimplantation) %>%  filter(DureeFact == max(DureeFact))
+    }
+    return(ecoleAfficheF)
+  })
+  
+  #filtrer les lignes par le graphique ----
+  filteredGraphEcole <- reactive({
+    
+    currentlyFiltered <- ecole()
     
     if(!is.null(input$distribPlot_brush)){
       thisSel <- input$distribPlot_brush
@@ -96,8 +125,9 @@ shinyServer(function(input, output, session) {
       ) %>% 
       addMapPane("PaneDiocese", zIndex = 410) %>%  # Level 1
       addMapPane("PaneT0NewBlack", zIndex = 420) %>%  # Level 2
-      addMapPane("PaneT0New", zIndex = 430) %>%  # Level 3
-      addMapPane("PaneChefsLieux", zIndex = 450) %>%  # Level 4
+      addMapPane("paneEcole", zIndex = 430) %>%   # Level 3
+      addMapPane("PaneT0New", zIndex = 440) %>%  # Level 4
+      addMapPane("PaneChefsLieux", zIndex = 450) %>%  # Level 5
       hideGroup("Diocèse") %>% 
       hideGroup("Chefs lieux de Diocèse") %>%
       addProviderTiles(providers$CartoDB.Positron) %>% 
@@ -125,6 +155,17 @@ shinyServer(function(input, output, session) {
         group = "Chefs lieux de Diocèse",
         options = pathOptions(pane = "PaneChefsLieux")
       )%>%
+      addCircleMarkers(
+        data = T0Impl,
+        lat = T0Impl$lat,
+        lng = T0Impl$lng,
+        radius = 1,
+        color = "black",
+        stroke = FALSE,
+        fillOpacity = 1,
+        group = 'hors-selection',
+        options = pathOptions(pane = "PaneT0NewBlack")
+      ) %>%
       addDrawToolbar(rectangleOptions = list(shapeOptions = drawShapeOptions(color = colorSpat,
                                                                         fillOpacity = 0.5,
                                                                         fillColor = colorSpat,
@@ -142,24 +183,12 @@ shinyServer(function(input, output, session) {
       mapProxy <- leafletProxy("map", session = session)
       mapProxy %>%
         clearGroup('reactive') %>% 
-        clearGroup('hors-selection') %>% 
-        addCircleMarkers(
-          data = T0New,
-          lat = T0New$lat,
-          lng = T0New$lng,
-          radius = 1,
-          color = "black",
-          stroke = FALSE,
-          fillOpacity = 1,
-          group = 'hors-selection',
-          options = pathOptions(pane = "PaneT0NewBlack")
-        ) %>%
         addCircleMarkers(
           data = mapData,
           lat = mapData$lat,
           lng = mapData$lng,
           radius = 3,
-          color = colorTempo,
+          color = ~modaNiv1_Color,
           stroke = FALSE,
           fillOpacity = 1,
           popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
@@ -179,13 +208,12 @@ shinyServer(function(input, output, session) {
       mapProxy <- leafletProxy("map", session = session)
       mapProxy %>%
         clearGroup('reactive') %>% 
-        clearGroup('hors-selection') %>% 
         addCircleMarkers(
           data = mapData,
           lat = mapData$lat,
           lng = mapData$lng,
           radius = 3,
-          color = colorAttr,
+          color = ~modaNiv1_Color,
           stroke = F,
           fillOpacity = 1,
           popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
@@ -205,11 +233,11 @@ shinyServer(function(input, output, session) {
   
   #Affichage des liens ----
   observe({
-    Liens <- filteredGraphLines()
     if(input$RelR==T){
+      Liens <- filteredGraphLines()
       mapProxy <- leafletProxy("map", session = session)
       mapProxy %>%
-        clearGroup('links') %>% 
+        clearGroup('links') %>%
         addPolylines(data = Liens,
                      color = ~liensPal(modAgreg),
                      opacity = 1,
@@ -233,6 +261,49 @@ shinyServer(function(input, output, session) {
       hide(id = 'lineLegend')
     }
   })
+  
+  #Affichage des ecoles ----
+  observe({
+    if(input$EcolR==T){
+      Ecole <- filteredGraphEcole()
+      mapProxy <- leafletProxy("map", session = session)
+      mapProxy %>%
+        clearGroup('ecol') %>% 
+        addCircleMarkers(
+          data = Ecole,
+          lat = Ecole$lat,
+          lng = Ecole$lng,
+          radius = 5,
+          color = "#333333",
+          stroke = F,
+          fillOpacity = 1,
+          popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
+                         "<strong>Diocèse :</strong>", Diocese,"</br>",
+                         "<strong>D1 :</strong>", date_start_min,"</br>",
+                         "<strong>D2 :</strong>", date_start_max,"</br>",
+                         "<strong>D3 :</strong>", date_stop_min,"</br>",
+                         "<strong>D4 :</strong>", date_stop_max,"</br>",
+                         "<strong>caracNew :</strong>",caracNew,"</br>",
+                         "<strong>Modalité :</strong>",modAgreg,"</br>",
+                         "<strong>link :</strong>",linked_implantation_name),
+          group = 'ecol',
+          options = pathOptions(pane = "paneEcole")
+        )
+      show(id ='ecoleLegend')
+    }else if (input$EcolR==F){
+      mapProxy <- leafletProxy("map", session = session)
+      mapProxy %>%
+        clearGroup('ecol')
+      hide(id = 'ecoleLegend')
+    }
+  })
+  
+  #âAffichage legende section affichage
+  # if(input$conf=="Statuts"){
+  #   show(id = 'statLegend')
+  # }else{
+  #   hide(id = 'statLegend')
+  # }
 
   
   

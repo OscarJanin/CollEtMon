@@ -1,7 +1,13 @@
+source("global.R")
+
 shinyUI(fluidPage(
   useShinyjs(),  # Set up shinyjs
   
-  tags$head(tags$style(".checkbox{
+  tags$head(tags$style("
+                       body {
+                          font-family: candara;
+                       }
+                       .checkbox{
                           margin-top:2px;
                           margin-bottom:2px
                        }
@@ -22,6 +28,20 @@ shinyUI(fluidPage(
                           background-color: lightgrey;
                           padding: 10px;
                           margin: 5px;
+                       }
+                       #ecoleLegend{
+                          background-color: lightgrey;
+                          padding: 10px;
+                          margin: 5px;
+                       }
+                       #imgEcole{
+                          width: 10px;
+                          height: 10px;
+                          -webkit-border-radius: 25px;
+                          -moz-border-radius: 25px;
+                          border-radius: 25px;
+                          background: #333333;
+                          display: inline-block
                        }
                        "
   )),
@@ -86,6 +106,12 @@ shinyUI(fluidPage(
                      "Type de communauté"="Type de communauté",
                      "Relations"="Relations")),
       checkboxInput("EcolR",tags$b("École")),
+      hidden(
+        div(id = "ecoleLegend",
+            div( id = "imgEcole"),
+            p('  École')
+        )
+      ),
       checkboxInput("RelR",tags$b("Relations")),
       hidden(
             div(id = "lineLegend",

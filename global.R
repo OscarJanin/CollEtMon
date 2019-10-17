@@ -16,7 +16,11 @@ Diocese1317 <- readRDS("Diocese1317.Rds")
 
 T0New <- readRDS("T0New.Rds")
 
+T0Impl <- readRDS("T0Impl.Rds")
+
 Liens <- readRDS("liens.Rds")
+
+Ecole <- readRDS("ecole.Rds")
 
 #liste input
 listObs <- list("Coutumiers",
@@ -45,7 +49,7 @@ listComm <- list("Masculine",
 listRel <- list("A",
                 "D",
                 "H",
-                "X")
+                "C")
 
 colorSpat <- "#9B372F"
 colorAttr <- "#9C7B36"
@@ -54,3 +58,8 @@ colorTempo <- "#294B59"
 #Couleur links
 Liens$modAgreg <- as.factor(Liens$modAgreg)
 liensPal <- colorFactor(c("#8976B5","#CF6529","#5CA866","#69583E"),Liens$modAgreg)
+
+
+
+
+
