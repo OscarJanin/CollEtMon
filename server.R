@@ -298,7 +298,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  #âAffichage legende section affichage
+  #Affichage legende section affichage
   # if(input$conf=="Statuts"){
   #   show(id = 'statLegend')
   # }else{
