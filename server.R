@@ -10,7 +10,7 @@ shinyServer(function(input, output, session) {
                                               input$Ecolc,
                                               input$Commc,
                                               input$Relc))
-
+    
     # T0NewSel <- filter(T0NewSel, TypeEntiete != "École")
     idImplSel <- unique(T0NewSel$idimplantation)
     T0NewFiltre <- filter(T0New, idimplantation %in% idImplSel)
@@ -167,9 +167,9 @@ shinyServer(function(input, output, session) {
         options = pathOptions(pane = "PaneT0NewBlack")
       ) %>%
       addDrawToolbar(rectangleOptions = list(shapeOptions = drawShapeOptions(color = colorSpat,
-                                                                        fillOpacity = 0.5,
-                                                                        fillColor = colorSpat,
-                                                                        weight = 1)),
+                                                                             fillOpacity = 0.5,
+                                                                             fillColor = colorSpat,
+                                                                             weight = 1)),
                      polylineOptions = F, polygonOptions = F, circleOptions = F,
                      markerOptions = F, singleFeature = T, circleMarkerOptions = F,
                      editOptions = editToolbarOptions(edit = F, remove = T)
@@ -298,13 +298,37 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  #Affichage legende section affichage
-  # if(input$conf=="Statuts"){
-  #   show(id = 'statLegend')
-  # }else{
-  #   hide(id = 'statLegend')
-  # }
-
+  #Affichage legende section affichage ----
+  
+  observe({
+    if(input$conf=="Statuts"){
+      show(id = 'statLegend')
+    }else{
+      hide(id = 'statLegend')
+    }})
+  
+  observe({
+    if(input$conf=="Ordres"){
+      show(id = 'ordrLegend')
+    }else{
+      hide(id = 'ordrLegend')
+    }})
+  
+  observe({
+    if(input$conf=="Observance"){
+      show(id = 'obsLegend')
+    }else{
+      hide(id = 'obsLegend')
+    }})
+  
+  observe({
+    if(input$conf=="Type de communauté"){
+      show(id = 'commLegend')
+    }else{
+      hide(id = 'commLegend')
+    }})
+  
+  
   
   
   #Sortie graph----
@@ -349,7 +373,7 @@ shinyServer(function(input, output, session) {
     
     #Nombre d'implantation affiché-----
     output$selAttr <- renderText({ 
-        paste("Selection attributaire : ","<font color=\"#9C7B36\"><b>", count(points()), "</b></font>")
+      paste("Selection attributaire : ","<font color=\"#9C7B36\"><b>", count(points()), "</b></font>")
     })
     output$selTemp <- renderText({ 
       if(is.null(nrow(filteredGraphData()))){

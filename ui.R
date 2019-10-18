@@ -5,43 +5,63 @@ shinyUI(fluidPage(
   
   tags$head(tags$style("
                        body {
-                          font-family: candara;
+                       font-family: candara;
                        }
                        .checkbox{
-                          margin-top:2px;
-                          margin-bottom:2px
+                       margin-top:2px;
+                       margin-bottom:2px
                        }
                        .form-group {
-                          margin:0px
+                       margin:0px
                        }
                        .panel-body {
-                          padding: 5px;
+                       padding: 5px;
                        }
                        p{
-                          display:contents 
+                       display:contents 
                        }
                        .imgLineLegend{
-                          height: 5px;
-                          width: 30px;
+                       height: 5px;
+                       width: 30px;
                        }
                        #lineLegend{
-                          background-color: lightgrey;
-                          padding: 10px;
-                          margin: 5px;
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
                        }
                        #ecoleLegend{
-                          background-color: lightgrey;
-                          padding: 10px;
-                          margin: 5px;
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
+                       }
+                       #statLegend{
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
+                       }
+                       #ordrLegend{
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
+                       }
+                       #obsLegend{
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
+                       }
+                       #commLegend{
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
                        }
                        #imgEcole{
-                          width: 10px;
-                          height: 10px;
-                          -webkit-border-radius: 25px;
-                          -moz-border-radius: 25px;
-                          border-radius: 25px;
-                          background: #333333;
-                          display: inline-block
+                       width: 10px;
+                       height: 10px;
+                       -webkit-border-radius: 25px;
+                       -moz-border-radius: 25px;
+                       border-radius: 25px;
+                       background: #333333;
+                       display: inline-block
                        }
                        "
   )),
@@ -103,8 +123,125 @@ shinyUI(fluidPage(
                    c("Statuts"="Statuts",
                      "Ordres"="Ordres",
                      "Observance"="Observance",
-                     "Type de communauté"="Type de communauté",
-                     "Relations"="Relations")),
+                     "Type de communauté"="Type de communauté"
+                   )),
+      hidden(
+        div(id = "statLegend",
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#a50f15' />
+              </svg>"
+            ),
+            p('  Régulier'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#377eb8' />
+              </svg>"
+            ),
+            p('  Séculier'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#8da0cb' />
+              </svg>"
+            ),
+            p('  Séculier-communautaire'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#999999' />
+              </svg>"
+            ),
+            p('  Autre')
+            )
+            ),
+      hidden(
+        div(id = "ordrLegend",
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#ffffb3' />
+              </svg>"
+            ),
+            p('  Bénédictins'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#fb8072' />
+              </svg>"
+            ),
+            p('  Chanoines-réguliers'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#fdb462' />
+              </svg>"
+            ),
+            p('  Monachisme-érémitique'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#80b1d3' />
+              </svg>"
+            ),
+            p('  Hospitalier et militaire'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#8dd3c7' />
+              </svg>"
+            ),
+            p('  Mendiants'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#bebada' />
+              </svg>"
+            ),
+            p('  Clercs-régulier')
+            )
+            ),
+      hidden(
+        div(id = "obsLegend",
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#883799' />
+              </svg>"
+            ),
+            p('  Coutumiers'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='#7A3B1A' />
+              </svg>"
+            ),
+            p('  Règles')
+            )
+            ),
+      hidden(
+        div(id = "commLegend",
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='turquoise' />
+              </svg>"
+            ),
+            p('  Masculine'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='thistle' />
+              </svg>"
+            ),
+            p('  Double'),
+            br(),
+            HTML(
+              "<svg height='10' width='10'>
+              <circle cx='5' cy='5' r='5' fill='violet' />
+              </svg>"
+            ),
+            p('  Féminine')
+            )
+            ),
       checkboxInput("EcolR",tags$b("École")),
       hidden(
         div(id = "ecoleLegend",
@@ -114,22 +251,22 @@ shinyUI(fluidPage(
       ),
       checkboxInput("RelR",tags$b("Relations")),
       hidden(
-            div(id = "lineLegend",
-                  img( class = "imgLineLegend", src = "ligneViolet.png"),
-                  p('  A'),
-                  br(),
-                  img( class = "imgLineLegend", src = "ligneOrange.png"),
-                  p('  D'),
-                  br(),
-                  img( class = "imgLineLegend", src = "ligneVert.png"),
-                  p('  H'),
-                  br(),
-                  img( class = "imgLineLegend", src = "ligneMarron.png"),
-                  p('  X')
-                )
-            )
+        div(id = "lineLegend",
+            img( class = "imgLineLegend", src = "ligneViolet.png"),
+            p('  A'),
+            br(),
+            img( class = "imgLineLegend", src = "ligneOrange.png"),
+            p('  D'),
+            br(),
+            img( class = "imgLineLegend", src = "ligneVert.png"),
+            p('  H'),
+            br(),
+            img( class = "imgLineLegend", src = "ligneMarron.png"),
+            p('  X')
+        )
+      )
       
-    ),
+            ),
     # Main panel for displaying outputs ----
     column(width = 8,
            absolutePanel(bottom = "37%",
@@ -162,9 +299,7 @@ shinyUI(fluidPage(
                       height = "37vh",
                       brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE, fill = colorTempo, stroke = colorTempo))
     )
-  )
-  )
-)
-
-
+        )
+            )
+        )
 
