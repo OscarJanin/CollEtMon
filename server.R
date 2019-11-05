@@ -2,50 +2,67 @@ source("global.R")
 
 shinyServer(function(input, output, session) {
   
-  #filtrer les factoides par les input ----
-  points <- reactive({
-    T0NewSel <- filter(T0New, modAgreg %in% c(input$Obsc,
-                                              input$Ordrc,
-                                              input$Statc,
-                                              input$Ecolc,
-                                              input$Commc,
-                                              input$Relc))
-    
-    # T0NewSel <- filter(T0NewSel, TypeEntiete != "École")
-    idImplSel <- unique(T0NewSel$idimplantation)
-    T0NewFiltre <- filter(T0New, idimplantation %in% idImplSel)
-    T0NewAffiche <- filter(T0NewFiltre, caracNew %in% input$conf)
-    if(input$etat == "État final"){
-      T0NewAfficheF <- as.data.frame(T0NewAffiche %>%  group_by(idimplantation) %>%  filter(date_stop_max == max(date_stop_max)))
-    }else if(input$etat == "État initial"){
-      T0NewAfficheF <- as.data.frame(T0NewAffiche %>%  group_by(idimplantation) %>%  filter(date_start_min == min(date_start_min)))
-    }else if(input$etat == "État dominant"){
-      T0NewAfficheF <- as.data.frame(T0NewAffiche %>%  group_by(idimplantation) %>%  filter(DureeFact == max(DureeFact)))
-    }
-    return(T0NewAfficheF)
-  })
+  # #filtrer les factoides par les input ----
+  # points <- reactive({
+  #   T0NewSel <- filter(T0New, modAgreg %in% c(input$Obsc,
+  #                                             input$Ordrc,
+  #                                             input$Statc,
+  #                                             input$Ecolc,
+  #                                             input$Commc,
+  #                                             input$Relc))
+  #   
+  #   # T0NewSel <- filter(T0NewSel, TypeEntiete != "École")
+  #   idImplSel <- unique(T0NewSel$idimplantation)
+  #   T0NewFiltre <- filter(T0New, idimplantation %in% idImplSel)
+  #   T0NewAffiche <- filter(T0NewFiltre, caracNew %in% input$conf)
+  #   if(input$etat == "État final"){
+  #     T0NewAfficheF <- as.data.frame(T0NewAffiche %>%  group_by(idimplantation) %>%  slice(which.max(date_stop_max)))
+  #   }else if(input$etat == "État initial"){
+  #     T0NewAfficheF <- as.data.frame(T0NewAffiche %>%  group_by(idimplantation) %>%  slice(which.max(date_start_min)))
+  #   }else if(input$etat == "État dominant"){
+  #     T0NewAfficheF <- as.data.frame(T0NewAffiche %>%  group_by(idimplantation) %>%  slice(which.max(DureeFact)))
+  #   }
+  #   return(T0NewAfficheF)
+  # })
+  # 
+  # #filtrer les factoides par le graphique ----
+  # filteredGraphData <- reactive({
+  #   
+  #   currentlyFiltered <- points()
+  #   
+  #   if(!is.null(input$distribPlot_brush)){
+  #     thisSel <- input$distribPlot_brush
+  #     currentlyFiltered <- currentlyFiltered %>% 
+  #       filter(date_start_min >= thisSel$xmin, date_stop_max <= thisSel$xmax)
+  #   }
+  #     return(currentlyFiltered)
+  # })
   
-  #filtrer les factoides par le graphique ----
-  filteredGraphData <- reactive({
+  filteredData <- reactive({
     
-    noSelection <- TRUE
-    currentlyFiltered <- points()
+    currentlyFiltered <- filter(T0New, caracNew %in% input$conf)
     
     if(!is.null(input$distribPlot_brush)){
       thisSel <- input$distribPlot_brush
       currentlyFiltered <- currentlyFiltered %>% 
-        filter(date_start_min >= thisSel$xmin, date_start_min <= thisSel$xmax)
-      noSelection <- FALSE
+        filter(date_start_min >= thisSel$xmin, date_stop_max <= thisSel$xmax)
     }
-    if(!noSelection){
-      return(currentlyFiltered)
+    
+    if(input$etat == "État final"){
+      T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(date_stop_max)))
+    }else if(input$etat == "État initial"){
+      T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(date_start_min)))
+    }else if(input$etat == "État dominant"){
+      T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(DureeFact)))
     }
+    
+    return(T0NewEtat)
   })
   
   #filtrer les factoides par fenÃªtre spatiale ----
   filteredSpatialData <- reactive({
     
-    currentlyFilteredMap <- points()
+    currentlyFilteredMap <- filter(T0New, caracNew %in% input$conf)
     
     if(length(input$map_draw_all_features$features) > 0){
       coordSelBox <- unlist(input$map_draw_all_features$features[[1]]$geometry$coordinates)[c(1,2,4,5)]
@@ -59,7 +76,7 @@ shinyServer(function(input, output, session) {
   #filtrer les liens par les input ----
   lignes <- reactive({
     LiensSel <- filter(Liens, modAgreg == input$Relc)
-    
+
     idImplSel <- unique(LiensSel$idimplantation)
     LiensFiltre <- filter(Liens, idimplantation %in% idImplSel)
     if(input$etat == "État final"){
@@ -71,24 +88,24 @@ shinyServer(function(input, output, session) {
     }
     return(LiensAfficheF)
   })
-  
+
   #filtrer les liens par le graphique ----
   filteredGraphLines <- reactive({
-    
+
     currentlyFiltered <- lignes()
-    
+
     if(!is.null(input$distribPlot_brush)){
       thisSel <- input$distribPlot_brush
-      currentlyFiltered <- currentlyFiltered %>% 
+      currentlyFiltered <- currentlyFiltered %>%
         filter(date_start_min >= thisSel$xmin, date_start_min <= thisSel$xmax)
     }
     return(currentlyFiltered)
   })
-  
+
   #filtrer les ecoles par les input ----
   ecole <- reactive({
     ecoleSel <- filter(Ecole, modAgreg == input$Ecolc)
-    
+
     idImplSel <- unique(ecoleSel$idimplantation)
     ecoleFiltre <- filter(Ecole, idimplantation %in% idImplSel)
     if(input$etat == "État final"){
@@ -100,15 +117,15 @@ shinyServer(function(input, output, session) {
     }
     return(ecoleAfficheF)
   })
-  
-  #filtrer les lignes par le graphique ----
+
+  # filtrer les lignes par le graphique ----
   filteredGraphEcole <- reactive({
-    
+
     currentlyFiltered <- ecole()
-    
+
     if(!is.null(input$distribPlot_brush)){
       thisSel <- input$distribPlot_brush
-      currentlyFiltered <- currentlyFiltered %>% 
+      currentlyFiltered <- currentlyFiltered %>%
         filter(date_start_min >= thisSel$xmin, date_start_min <= thisSel$xmax)
     }
     return(currentlyFiltered)
@@ -128,6 +145,7 @@ shinyServer(function(input, output, session) {
       addMapPane("paneEcole", zIndex = 430) %>%   # Level 3
       addMapPane("PaneT0New", zIndex = 440) %>%  # Level 4
       addMapPane("PaneChefsLieux", zIndex = 450) %>%  # Level 5
+      hideGroup("hors-selection") %>% 
       hideGroup("Diocèse") %>% 
       hideGroup("Chefs lieux de Diocèse") %>%
       addProviderTiles(providers$CartoDB.Positron) %>% 
@@ -178,12 +196,12 @@ shinyServer(function(input, output, session) {
   
   #Affichage factoides filtré par le graph ----
   observe({
-    if(length(filteredGraphData()) > 1){
-      mapData <- filteredGraphData()
+      mapData <- filteredData()
       mapProxy <- leafletProxy("map", session = session)
       mapProxy %>%
         clearGroup('reactive') %>% 
         addCircleMarkers(
+          layerId=~idimplantation,
           data = mapData,
           lat = mapData$lat,
           lng = mapData$lng,
@@ -191,44 +209,20 @@ shinyServer(function(input, output, session) {
           color = ~modaNiv1_Color,
           stroke = FALSE,
           fillOpacity = 1,
-          popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
-                         "<strong>Diocèse :</strong>", Diocese,"</br>",
-                         "<strong>D1 :</strong>", date_start_min,"</br>",
-                         "<strong>D2 :</strong>", date_start_max,"</br>",
-                         "<strong>D3 :</strong>", date_stop_min,"</br>",
-                         "<strong>D4 :</strong>", date_stop_max,"</br>",
-                         "<strong>caracNew :</strong>",caracNew,"</br>",
-                         "<strong>Modalité :</strong>",modAgreg,"</br>",
-                         "<strong>link :</strong>",linked_implantation_name),
+          # popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
+          #                "<strong>Diocèse :</strong>", Diocese,"</br>",
+          #                "<strong>D1 :</strong>", date_start_min,"</br>",
+          #                "<strong>D2 :</strong>", date_start_max,"</br>",
+          #                "<strong>D3 :</strong>", date_stop_min,"</br>",
+          #                "<strong>D4 :</strong>", date_stop_max,"</br>",
+          #                "<strong>caracNew :</strong>",caracNew,"</br>",
+          #                "<strong>Modalité :</strong>",modAgreg,"</br>",
+          #                "<strong>link :</strong>",linked_implantation_name,"</br>",
+          #                "<strong>frequence :</strong>",Freq
+          #                ),
           group = 'reactive',
           options = pathOptions(pane = "PaneT0New") 
         )
-    } else {
-      mapData <- points()
-      mapProxy <- leafletProxy("map", session = session)
-      mapProxy %>%
-        clearGroup('reactive') %>% 
-        addCircleMarkers(
-          data = mapData,
-          lat = mapData$lat,
-          lng = mapData$lng,
-          radius = 3,
-          color = ~modaNiv1_Color,
-          stroke = F,
-          fillOpacity = 1,
-          popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
-                         "<strong>Diocèse :</strong>", Diocese,"</br>",
-                         "<strong>D1 :</strong>", date_start_min,"</br>",
-                         "<strong>D2 :</strong>", date_start_max,"</br>",
-                         "<strong>D3 :</strong>", date_stop_min,"</br>",
-                         "<strong>D4 :</strong>", date_stop_max,"</br>",
-                         "<strong>caracNew :</strong>",caracNew,"</br>",
-                         "<strong>Modalité :</strong>",modAgreg,"</br>",
-                         "<strong>link :</strong>",linked_implantation_name),
-          group = 'reactive',
-          options = pathOptions(pane = "PaneT0New")
-        )
-    }
   })
   
   #Affichage des liens ----
@@ -334,10 +328,10 @@ shinyServer(function(input, output, session) {
   #Sortie graph----
   output$distribPlot <- renderPlot({
     
-    T0New <- points()
     
-    distribPlot <- ggplot(T0New,aes(date_start_min)) +
-      geom_density(col = colorAttr, fill = colorAttr, alpha = 0.3, adjust = 0.75)
+    # distribPlot <- ggplot(T0New,aes(date_start_min)) +
+    #   geom_density(col = colorAttr, fill = colorAttr, alpha = 0.3, adjust = 0.75)
+    distribPlot <- graphique_tapis(carac = input$conf, T0New = T0New)
     
     
     if(!is.null(nrow(filteredSpatialData())) && nrow(filteredSpatialData())> 1){
@@ -370,16 +364,26 @@ shinyServer(function(input, output, session) {
       
     }
     
+            nbConf <- filter(T0New, caracNew %in% input$conf)
+            
+            if(input$etat == "État final"){
+              nbEtat <- as.data.frame(nbConf %>%  group_by(idimplantation) %>%  slice(which.max(date_stop_max)))
+            }else if(input$etat == "État initial"){
+              nbEtat <- as.data.frame(nbConf %>%  group_by(idimplantation) %>%  slice(which.max(date_start_min)))
+            }else if(input$etat == "État dominant"){
+              nbEtat <- as.data.frame(nbConf %>%  group_by(idimplantation) %>%  slice(which.max(DureeFact)))
+            }
+    
     
     #Nombre d'implantation affiché-----
     output$selAttr <- renderText({ 
-      paste("Selection attributaire : ","<font color=\"#9C7B36\"><b>", count(points()), "</b></font>")
+      paste("Selection attributaire : ","<font color=\"#9C7B36\"><b>", nrow(nbEtat), "</b></font>")
     })
     output$selTemp <- renderText({ 
-      if(is.null(nrow(filteredGraphData()))){
+      if(is.null(input$distribPlot_brush)){
         paste("Selection temporelle : 0")
       }else{
-        paste("Selection temporelle : ","<font color=\"#294B59\"><b>", count(filteredGraphData()), "</b></font>")
+        paste("Selection temporelle : ","<font color=\"#294B59\"><b>", nrow(filteredData()), "</b></font>")
       }
     })
     output$selSpat <- renderText({ 
@@ -392,5 +396,32 @@ shinyServer(function(input, output, session) {
     
     return(distribPlot)
   })
+  
+  showPopup <- function(id, lat, lng) {
+    chrngr <- chronogramme(id)
+    svg(filename= paste(folder,"plot.svg", sep = "/"), 
+        width = 500*0.01 , height = 300*0.01 )
+    print(chrngr)
+    # plot(chrngr)
+    dev.off()
+    
+    content <- paste(readLines(paste(folder,"plot.svg",sep="/")), collapse = "")
+    
+    leafletProxy("map") %>% addPopups(lng, lat, content, layerId = id, options = popupOptions(maxWidth = 500))
+  }
+  
+  #Popup Chronogramme ----
+  observe({
+    leafletProxy("map") %>% clearPopups()
+    event <- input$map_marker_click
+    if (is.null(event))
+      return()
+    
+    isolate({
+      showPopup(event$id, event$lat, event$lng)
+    })
+  })
+  
+  
   
 })

@@ -265,7 +265,6 @@ shinyUI(fluidPage(
             p('  X')
         )
       )
-      
             ),
     # Main panel for displaying outputs ----
     column(width = 8,
@@ -295,9 +294,11 @@ shinyUI(fluidPage(
                          htmlOutput("selTemp"),
                          htmlOutput("selSpat")),
            leafletOutput("map", height = "60vh"),
-           plotOutput("distribPlot", 
-                      height = "37vh",
-                      brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE, fill = colorTempo, stroke = colorTempo))
+           # plotOutput("distribPlot", 
+           #            height = "37vh",
+           #            brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE, fill = colorTempo, stroke = colorTempo)),
+           plotOutput("distribPlot", height = "37vh",
+                      brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE))
     )
         )
             )
