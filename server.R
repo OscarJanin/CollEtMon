@@ -2,42 +2,7 @@ source("global.R")
 
 shinyServer(function(input, output, session) {
   
-  # #filtrer les factoides par les input ----
-  # points <- reactive({
-  #   T0NewSel <- filter(T0New, modAgreg %in% c(input$Obsc,
-  #                                             input$Ordrc,
-  #                                             input$Statc,
-  #                                             input$Ecolc,
-  #                                             input$Commc,
-  #                                             input$Relc))
-  #   
-  #   # T0NewSel <- filter(T0NewSel, TypeEntiete != "École")
-  #   idImplSel <- unique(T0NewSel$idimplantation)
-  #   T0NewFiltre <- filter(T0New, idimplantation %in% idImplSel)
-  #   T0NewAffiche <- filter(T0NewFiltre, caracNew %in% input$conf)
-  #   if(input$etat == "État final"){
-  #     T0NewAfficheF <- as.data.frame(T0NewAffiche %>%  group_by(idimplantation) %>%  slice(which.max(date_stop_max)))
-  #   }else if(input$etat == "État initial"){
-  #     T0NewAfficheF <- as.data.frame(T0NewAffiche %>%  group_by(idimplantation) %>%  slice(which.max(date_start_min)))
-  #   }else if(input$etat == "État dominant"){
-  #     T0NewAfficheF <- as.data.frame(T0NewAffiche %>%  group_by(idimplantation) %>%  slice(which.max(DureeFact)))
-  #   }
-  #   return(T0NewAfficheF)
-  # })
-  # 
-  # #filtrer les factoides par le graphique ----
-  # filteredGraphData <- reactive({
-  #   
-  #   currentlyFiltered <- points()
-  #   
-  #   if(!is.null(input$distribPlot_brush)){
-  #     thisSel <- input$distribPlot_brush
-  #     currentlyFiltered <- currentlyFiltered %>% 
-  #       filter(date_start_min >= thisSel$xmin, date_stop_max <= thisSel$xmax)
-  #   }
-  #     return(currentlyFiltered)
-  # })
-  
+ 
   filteredData <- reactive({
     
     currentlyFiltered <- filter(T0New, caracNew %in% input$conf)
@@ -45,7 +10,7 @@ shinyServer(function(input, output, session) {
     if(!is.null(input$distribPlot_brush)){
       thisSel <- input$distribPlot_brush
       currentlyFiltered <- currentlyFiltered %>% 
-        filter(date_start_min >= thisSel$xmin, date_stop_max <= thisSel$xmax)
+      filter(!(date_stop_max<= thisSel$xmin | date_start_min>=thisSel$xmax))
     }
     
     if(input$etat == "État final"){
@@ -57,6 +22,14 @@ shinyServer(function(input, output, session) {
     }
     
     return(T0NewEtat)
+  })
+  
+  filteredTRSPData <- reactive({
+    
+    currentlyFiltered <- filter(T0New, caracNew %in% input$conf)
+    
+    
+    return(currentlyFiltered)
   })
   
   #filtrer les factoides par fenÃªtre spatiale ----
@@ -223,6 +196,25 @@ shinyServer(function(input, output, session) {
           group = 'reactive',
           options = pathOptions(pane = "PaneT0New") 
         )
+  })
+  
+  observe({
+    if(!is.null(input$distribPlot_brush)){
+      trspData <- filteredTRSPData()
+      mapProxy <- leafletProxy("map", session = session, data = trspData)
+      mapProxy %>%
+        clearGroup('trsp')%>%
+        addCircleMarkers(
+          data = trspData,
+          lat = trspData$lat,
+          lng = trspData$lng,
+          radius = 3,
+          color = ~modaNiv1_Color,
+          stroke = F,
+          fillOpacity = 0.05,
+          group = 'trsp'
+        )
+    }
   })
   
   #Affichage des liens ----

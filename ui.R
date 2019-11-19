@@ -298,7 +298,7 @@ shinyUI(fluidPage(
            #            height = "37vh",
            #            brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE, fill = colorTempo, stroke = colorTempo)),
            plotOutput("distribPlot", height = "37vh",
-                      brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE))
+                      brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE,fill = "black"))
     )
         )
             )

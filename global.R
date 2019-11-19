@@ -18,9 +18,14 @@ ChefLieu1317 <- readRDS("ChefLieu1317.Rds")
 
 Diocese1317 <- readRDS("Diocese1317.Rds")
 
-T0New <- readRDS("T0New.Rds")
+# T0New <- readRDS("T0New.Rds")
+T0New <- readRDS("T0NewBase.Rds")
+CaracHist<-readRDS(file = "NewModelCaracModalitesColor2.Rds")
 
-T0Impl <- readRDS("T0Impl.Rds")
+T0New<-T0New %>% 
+  left_join(select(CaracHist,modalite:modaNiv1, modaNiv2, modaNiv1_Color),by="modalite")
+
+T0impl <- readRDS("T0Impl.Rds")
 
 Liens <- readRDS("liens.Rds")
 
@@ -67,27 +72,28 @@ liensPal <- colorFactor(c("#8976B5","#CF6529","#5CA866","#69583E"),Liens$modAgre
 #Fonctions ----
 
 graphique_tapis <- function(carac,T0New){
-  #Debut preparation
+  
   T0NewTapis<-T0New %>% 
     mutate(date_stopC=ifelse(date_stopC>1800,1800,date_stopC)) %>% 
     mutate(date_stopC=ifelse(date_stopC==date_startC,date_stopC+5,date_stopC)) %>% #pour y voir qqchose
-    mutate(dateC=(date_stopC+date_startC)/2)  #pour l'utilisation de linerange dans ggplot
+    mutate(dateC=(date_stopC+date_startC)/2)  #pour l'utilisation de linerange dasn ggplot
   
   ListemodT0<-T0NewTapis %>% 
     group_by(caracNew,modaNiv1,modalite) %>% 
     summarise(n=n())
+  ListeMod<-CaracHist
   
-  #########Choix du point de vue= PdV
+  #########Choix du point de vue= Carac
   PdV=carac
   
   TPdV<-filter(T0NewTapis,caracNew==PdV)
   
-  TImplPdV<-TPdV %>% 
+  TPdVimpl<-TPdV %>% 
     group_by(idimplantation) %>% 
-    summarise (dateminPdV=min(date_startC,na.rm=TRUE),
-               datemaxPdV=max(date_stopC,na.rm=TRUE),
+    summarise (dateminPdV=min(date_start_min,na.rm=TRUE),
+               datemaxPdV=max(date_stop_max,na.rm=TRUE),
                nbEtats=n()) %>% 
-    left_join(T0Impl,by="idimplantation")
+    left_join(T0impl,by="idimplantation")
   
   ###########proto Algo
   DateAmpl<-50   # amplitude des classes
@@ -95,51 +101,62 @@ graphique_tapis <- function(carac,T0New){
   
   #initialisation fichier de W
   TPdVW<-TPdV %>% 
-    mutate (modaW=modaNiv1) #Choix de travail sur modNiv2 de categories de caracNew
+    mutate (modaW=modaNiv1) #Choix de travail sur modNiv2 de catégories de caracNew
   TPdVW$idimplantation<-as.factor(TPdVW$idimplantation)
   
-  couleur<-filter(T0New,caracNew==PdV) %>% 
+  couleur<-filter(CaracHist,caracNew==PdV) %>% 
     mutate(modaW=modaNiv1,modaW_Color=modaNiv1_Color) %>% 
     group_by(modaW,modaW_Color) %>% 
     summarise(nmodalite=n()) %>% 
     ungroup()
-  #verification de la coherence entre les 2 sources
+  #vérification de la cohérence entre les 2 sources
   couleur[!(couleur$modaW %in% TPdVW$modaW),]
   
   cols<-couleur$modaW_Color
   names(cols)<-couleur$modaW
   
-  #decoupage pour courbe de frequence
+  #découpage pour courbe de fréquence
   estdans<-function(min,max,d1,d2) {
     ifelse(((min>=d1) & (min<=d2)),1,
            ifelse(((min<d1)& (max>d1)),1,0))
   }
   Bmin<-summarise(filter(TPdVW,!is.na(date_start_min)),min=min(date_start_min))$min
   Bmax<-summarise(filter(TPdVW,!is.na(date_stop_max)),max=max(date_stop_max))$max
-  DateClass<-seq(Bmin,Bmax,DateAmpl)
+  DateClass<-seq(floor(Bmin/10)*10,Bmax,DateAmpl)
+  
   
   TPdVWdis<-select(TPdVW,idfactoid,idimplantation, usual_name,date_startC,date_stopC,DureeFact,modaW)
   
   Vzero<-rep(0,nrow(TPdVWdis))
-  i<-1
+  i<-2
   for (i in 1:length(DateClass)) {
     TPdVWdis<-cbind(TPdVWdis,Vzero)
     colnames(TPdVWdis)[7+i]<-paste("A",DateClass[i],sep="")
-    TPdVWdis[7+i]<-ifelse(((TPdVWdis$date_startC>=DateClass[i]) & (TPdVWdis$date_startC<=DateClass[i+1])),1,
-                          ifelse(((TPdVWdis$date_startC<DateClass[i])& (TPdVWdis$date_stopC>DateClass[i])),1,0))
+    TPdVWdis[7+i]<-ifelse(((TPdVWdis$date_stopC<DateClass[i]) | (TPdVWdis$date_startC >DateClass[i+1])),0,1)
+    
   }
-  NcumulModa<-select(TPdVWdis,-c(1:6)) %>% 
+  
+  NcumulModa<-select(TPdVWdis,-c(1,3:6)) %>% 
+    group_by(idimplantation,modaW) %>% 
+    summarise_all(max) %>% 
+    ungroup() %>% 
+    select(-idimplantation) %>% 
     gather(Date,Freq,-modaW) %>% 
     mutate(Date=as.numeric(substr(Date,2,nchar(Date)))) %>% 
     filter(!is.na(Freq) & Freq>0)%>% 
     group_by(modaW,Date) %>% 
     summarize(Freq=sum(Freq,na.rm=TRUE)) %>% 
     arrange(Date,desc(Freq))  
-  g<-ggplot(NcumulModa,aes(Date,fill=modaW,weight=Freq))+
-    geom_bar(width = 50)+
+  
+  sum(TPdVWdis$A400,na.rm=TRUE)
+  ggplot(NcumulModa)+
+    geom_bar(aes(x=Date, Y=Freq))
+  
+  g<-ggplot(NcumulModa)+
+    geom_bar(width = 50, aes(x=Date,fill=modaW,y=Freq), stat="identity")+
+    ggtitle(paste("Chronogramme",PdV))+
     scale_fill_manual(values=cols)+
-    xlab(paste("Périodes de ",DateAmpl," ans",sep=""))+
-    theme(legend.position = "none")
+    xlab(paste("Périodes de ",DateAmpl," ans",sep=""))
   
   return(g)
 }
