@@ -6,6 +6,7 @@ library(sf)
 library(shinyBS)
 library(shinyjs)
 library(cartography)
+library(htmltools) #for leaflet label
 
 
 options(encoding = "UTF-8")
@@ -18,12 +19,10 @@ ChefLieu1317 <- readRDS("ChefLieu1317.Rds")
 
 Diocese1317 <- readRDS("Diocese1317.Rds")
 
-# T0New <- readRDS("T0New.Rds")
 T0New <- readRDS("T0NewBase.Rds")
-CaracHist<-readRDS(file = "NewModelCaracModalitesColor2.Rds")
+CaracHist<-readRDS(file = "CaracHist.Rds")
 
-T0New<-T0New %>% 
-  left_join(select(CaracHist,modalite:modaNiv1, modaNiv2, modaNiv1_Color),by="modalite")
+T0New <- merge(select(CaracHist,modalite,modaNiv1, modaNiv1_Color), T0New, by.x="modalite",by.y="modalite")
 
 T0impl <- readRDS("T0Impl.Rds")
 
@@ -154,9 +153,9 @@ graphique_tapis <- function(carac,T0New){
   
   g<-ggplot(NcumulModa)+
     geom_bar(width = 50, aes(x=Date,fill=modaW,y=Freq), stat="identity")+
-    ggtitle(paste("Chronogramme",PdV))+
     scale_fill_manual(values=cols)+
-    xlab(paste("Périodes de ",DateAmpl," ans",sep=""))
+    xlab(paste("Périodes de ",DateAmpl," ans",sep=""))+
+    theme(legend.position = 'none')
   
   return(g)
 }
@@ -194,7 +193,7 @@ chronogramme <- function(idimpl){
     scale_color_manual(values=colsChro)+
     coord_flip()+
     theme(plot.margin = unit(c( 0.1, 0.1, 0.1, 0.1), "cm"),
-          legend.position = 'bottom',
+          legend.position = 'none',
           legend.justification="left",
           legend.margin=margin(0,0,0,0),
           legend.box.margin=margin(0,0,0,0),
@@ -209,7 +208,6 @@ chronogramme <- function(idimpl){
   
   return(p)
 }
-
 
 
 

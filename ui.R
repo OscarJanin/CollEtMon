@@ -54,6 +54,26 @@ shinyUI(fluidPage(
                        padding: 10px;
                        margin: 5px;
                        }
+                       #statLegendBoxes{
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
+                       }
+                       #ordrLegendBoxes{
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
+                       }
+                       #obsLegendBoxes{
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
+                       }
+                       #commLegendBoxes{
+                       background-color: lightgrey;
+                       padding: 10px;
+                       margin: 5px;
+                       }
                        #imgEcole{
                        width: 10px;
                        height: 10px;
@@ -62,6 +82,48 @@ shinyUI(fluidPage(
                        border-radius: 25px;
                        background: #333333;
                        display: inline-block
+                       }
+                       .show{
+                       display: block 
+                       }
+                       .hide{
+                       display: none !important
+                       }
+                       #statToggle{
+                       fill: orange;
+                       cursor:pointer
+                       }
+                       #ordrToggle{
+                       fill: orange;
+                       cursor:pointer
+                       }
+                       #obsToggle{
+                       fill: orange;
+                       cursor:pointer
+                       }
+                       #commToggle{
+                       fill: orange;
+                       cursor:pointer
+                       }
+                      
+                       #statLegendBoxes label{
+                       font-weight: 100;
+                       margin: 0
+                       }
+                       #ordrLegendBoxes label{
+                       font-weight: 100;
+                       margin: 0
+                       }
+                       #obsLegendBoxes label{
+                       font-weight: 100;
+                       margin: 0
+                       }
+                       #commLegendBoxes label{
+                       font-weight: 100;
+                       margin: 0
+                       }
+                       input[type=checkbox]{
+                       margin: 0
                        }
                        "
   )),
@@ -119,129 +181,165 @@ shinyUI(fluidPage(
       width = 2,
       style = "height: 97vh; overflow: auto;background-color:#8C8C8C",
       titlePanel("Affichage"),
-      radioButtons("conf","",
-                   c("Statuts"="Statuts",
-                     "Ordres"="Ordres",
-                     "Observance"="Observance",
-                     "Type de communauté"="Type de communauté"
-                   )),
-      hidden(
-        div(id = "statLegend",
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#a50f15' />
-              </svg>"
-            ),
-            p('  Régulier'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#377eb8' />
-              </svg>"
-            ),
-            p('  Séculier'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#8da0cb' />
-              </svg>"
-            ),
-            p('  Séculier-communautaire'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#999999' />
-              </svg>"
-            ),
-            p('  Autre')
-            )
-            ),
-      hidden(
-        div(id = "ordrLegend",
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#ffffb3' />
-              </svg>"
-            ),
-            p('  Bénédictins'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#fb8072' />
-              </svg>"
-            ),
-            p('  Chanoines-réguliers'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#fdb462' />
-              </svg>"
-            ),
-            p('  Monachisme-érémitique'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#80b1d3' />
-              </svg>"
-            ),
-            p('  Hospitalier et militaire'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#8dd3c7' />
-              </svg>"
-            ),
-            p('  Mendiants'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#bebada' />
-              </svg>"
-            ),
-            p('  Clercs-régulier')
-            )
-            ),
-      hidden(
-        div(id = "obsLegend",
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#883799' />
-              </svg>"
-            ),
-            p('  Coutumiers'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='#7A3B1A' />
-              </svg>"
-            ),
-            p('  Règles')
-            )
-            ),
-      hidden(
-        div(id = "commLegend",
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='turquoise' />
-              </svg>"
-            ),
-            p('  Masculine'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='thistle' />
-              </svg>"
-            ),
-            p('  Double'),
-            br(),
-            HTML(
-              "<svg height='10' width='10'>
-              <circle cx='5' cy='5' r='5' fill='violet' />
-              </svg>"
-            ),
-            p('  Féminine')
-            )
-            ),
+      HTML('
+            <div class="attr-col shiny-input-radiogroup" id="conf">
+           
+           <input type="radio" id="Statuts" name="conf" value="Statuts" checked= "checked"/>
+           <label for="Statuts">Statuts</label>
+           
+           <svg height="10" width="10">
+           <polygon points="0 0, 10 0, 10 10, 0 10" id="statToggle"/>
+           </svg>
+           
+           <br/>
+           
+           <div id = "statLegend" class style = " display: none;" >
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#a50f15" /></svg>
+           <p>Régulier </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#377eb8" /></svg>
+           <p> Séculier </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#8da0cb" /></svg>
+           <p> Séculier-communautaire </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#999999" /></svg>
+           <p> Autres </p>
+           </div>
+           
+           <div id = "statLegendBoxes" class style = " display: none;" >
+           <input type="checkbox" id="Régulier" name="Régulier" checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#a50f15" /></svg> 
+           <label for="Régulier">Régulier</label>
+           </br>
+           <input type="checkbox" id="Séculier" name="Séculier" checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#377eb8" /></svg>
+           <label for="Séculier">Séculier</label>
+           </br>
+           <input type="checkbox" id="Séculiercommunautaire" name="Séculiercommunautaire" checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#8da0cb" /></svg>
+           <label for="Séculiercommunautaire">Séculier-communautaire</label>
+           </br>
+           <input type="checkbox" id="Autres" name="Autres" checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#999999" /></svg>
+           <label for="Autres">Autres</label>
+           </div>
+           
+           <input type="radio" id="Ordres" name="conf" value="Ordres"  />
+           <label for="Ordres">Ordres</label>
+           
+           <svg height="10" width="10">
+           <polygon points="0 0, 10 0, 10 10, 0 10" id="ordrToggle" />
+           </svg>
+           <br/>
+           
+           <div id = "ordrLegend" class style = " display: none;" >
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#ffffb3" /></svg>
+           <p> Bénédictins </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#fb8072" /></svg>
+           <p> Chanoines-réguliers </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#fdb462" /></svg>
+           <p> Monachisme-érémitique </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#80b1d3" /></svg>
+           <p> Hospitalier et militaire </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#8dd3c7" /></svg>
+           <p> Mendiants </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#bebada" /></svg>
+           <p> Clercs-régulier </p>
+           </div>
+           
+           <div id = "ordrLegendBoxes" class style = " display: none;" >
+           <input type="checkbox" id="Bénédictins" name="Bénédictins"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#ffffb3" /></svg>
+           <label for="Bénédictins">Bénédictins</label>
+           </br>
+           <input type="checkbox" id="Chanoinesréguliers" name="Chanoinesréguliers"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#fb8072" /></svg>
+           <label for="Chanoinesréguliers">Chanoines-réguliers</label>
+           </br>
+           <input type="checkbox" id="Monachismeérémitique" name="Monachismeérémitique"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#fdb462" /></svg>
+           <label for="Monachismeérémitique">Monachisme-érémitique</label>
+           </br>
+           <input type="checkbox" id="Hospitalieretmilitaire" name="Hospitalieretmilitaire"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#80b1d3" /></svg>
+           <label for="Hospitalieretmilitaire">Hospitalier et militaire</label>
+           </br>
+           <input type="checkbox" id="Mendiants" name="Mendiants"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#8dd3c7" /></svg>
+           <label for="Mendiants">Mendiants</label>
+           </br>
+           <input type="checkbox" id="Clercsrégulier" name="Clercsrégulier"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#bebada" /></svg>
+           <label for="Clercsrégulier">Clercs-régulier</label>
+           </div>
+           
+           
+           <input type="radio" id="Observance" name="conf" value="Observance" />
+           <label for="Observance">Observance</label>
+           <svg height="10" width="10">
+           <polygon points="0 0, 10 0, 10 10, 0 10" id="obsToggle" />
+           </svg>
+           <br/>
+           
+           <div id = "obsLegend" class style = " display: none;" >
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#883799" /></svg>
+           <p> Coutumiers </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#7A3B1A" /></svg>
+           <p> Règles </p>
+           </div>
+           
+           <div id = "obsLegendBoxes" class style = " display: none;" >
+           <input type="checkbox" id="Coutumiers" name="Coutumiers"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#883799" /></svg>
+           <label for="Coutumiers">Coutumiers</label>
+           </br>
+           <input type="checkbox" id="Règles" name="Règles"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#7A3B1A" /></svg>
+           <label for="Règles">Règles</label>
+           </div>
+           
+           <input type="radio" id="Type de communauté" name="conf" value="Type de communauté" />
+           <label for="Type de communauté">Type de communauté</label>
+           <svg height="10" width="10">
+           <polygon points="0 0, 10 0, 10 10, 0 10" id="commToggle" />
+           </svg>
+           </br>
+           
+           <div id = "commLegend" class style = " display: none;" >
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="turquoise" /></svg>
+           <p> Masculine </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="thistle" /></svg>
+           <p> Double </p>
+           </br>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="violet" /></svg>
+           <p> Féminine </p>
+           </div>
+           
+           <div id = "commLegendBoxes" class style = " display: none;" >
+           <input type="checkbox" id="Masculine" name="Masculine"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="turquoise" /></svg>
+           <label for="Masculine">Masculine</label>
+           </br>
+           <input type="checkbox" id="Double" name="Double"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="thistle" /></svg>
+           <label for="Double">Double</label>
+           </br>
+           <input type="checkbox" id="Féminine" name="Féminine"checked>
+           <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="violet" /></svg>
+           <label for="Féminine">Féminine</label>
+           </div>
+           
+           </div>
+           '
+      ),
       checkboxInput("EcolR",tags$b("École")),
       hidden(
         div(id = "ecoleLegend",

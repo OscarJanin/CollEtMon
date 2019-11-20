@@ -2,10 +2,61 @@ source("global.R")
 
 shinyServer(function(input, output, session) {
   
+  checkboxFilter <- function(DATA){
+    
+    if (input$Régulier == TRUE) RegulierV <- "Régulier" else RegulierV <- ""
+    if (input$Séculier == TRUE) SeculierV <- "Séculier" else SeculierV <- ""
+    if (input$Séculiercommunautaire == TRUE) SeculierCommuV <- "Séculier communautaire" else SeculierCommuV <- ""
+    if (input$Autres == TRUE) AutreV <- "Autre" else AutreV <- ""
+    
+    if (input$Bénédictins == TRUE) BenedictinsV <- "Bénédictins" else BenedictinsV <- ""
+    if (input$Chanoinesréguliers == TRUE) ChanoinesregV <- "Chanoines réguliers" else ChanoinesregV <- ""
+    if (input$Monachismeérémitique == TRUE) MonachismeV <- "Monachisme érémitique" else MonachismeV <- ""
+    if (input$Hospitalieretmilitaire == TRUE) HospitalierV <- "Hospitaliers et militaires" else HospitalierV <- ""
+    if (input$Mendiants == TRUE) MendiantsV <- "Mendiants" else MendiantsV <- ""
+    if (input$Clercsrégulier == TRUE) ClercsV <- "Clercs réguliers" else ClercsV <- ""
+    
+    if (input$Coutumiers == TRUE) CoutumiersV <- "Coutumiers" else CoutumiersV <- ""
+    if (input$Règles == TRUE) ReglesV <- "Règles" else ReglesV <- ""
+    
+    if (input$Masculine == TRUE) MasculineV <- "Masculine" else MasculineV <- ""
+    if (input$Double == TRUE) DoubleV <- "Double" else DoubleV <- ""
+    if (input$Féminine == TRUE) FeminineV <- "Féminine" else FeminineV <- ""
+    
+    currentlyFiltered <- filter(DATA, modAgreg %in% c(RegulierV,
+                                                       SeculierV,
+                                                       SeculierCommuV,
+                                                       AutreV,
+                                                       BenedictinsV,
+                                                       ChanoinesregV,
+                                                       MonachismeV,
+                                                       HospitalierV,
+                                                       MendiantsV,
+                                                       ClercsV,
+                                                       CoutumiersV,
+                                                       ReglesV,
+                                                       MasculineV,
+                                                       DoubleV,
+                                                       FeminineV))
+    return(currentlyFiltered)
+  }
+  
  
   filteredData <- reactive({
     
-    currentlyFiltered <- filter(T0New, caracNew %in% input$conf)
+    T0NewSel <- filter(T0New, modAgreg %in% c(input$Obsc,
+                                              input$Ordrc,
+                                              input$Statc,
+                                              input$Ecolc,
+                                              input$Commc,
+                                              input$Relc))
+    
+    idImplSel <- unique(T0NewSel$idimplantation)
+    T0NewSel <- filter(T0New, idimplantation %in% idImplSel)
+    
+    currentlyFiltered <- checkboxFilter(T0NewSel)
+    
+    currentlyFiltered <- filter(currentlyFiltered, caracNew %in% input$conf)
     
     if(!is.null(input$distribPlot_brush)){
       thisSel <- input$distribPlot_brush
@@ -24,10 +75,19 @@ shinyServer(function(input, output, session) {
     return(T0NewEtat)
   })
   
+  
+  
   filteredTRSPData <- reactive({
     
-    currentlyFiltered <- filter(T0New, caracNew %in% input$conf)
+    currentlyFiltered <- checkboxFilter(T0New)
     
+    currentlyFiltered <- filter(currentlyFiltered, caracNew %in% input$conf)
+    
+    if(!is.null(input$distribPlot_brush)){
+      thisSel <- input$distribPlot_brush
+      currentlyFiltered <- currentlyFiltered %>% 
+        filter((date_stop_max<= thisSel$xmin | date_start_min>=thisSel$xmax))
+    }
     
     return(currentlyFiltered)
   })
@@ -113,15 +173,18 @@ shinyServer(function(input, output, session) {
         overlayGroups = c("Diocèse", "Chefs lieux de Diocèse","hors-selection"),
         options = layersControlOptions(collapsed = T)
       ) %>% 
-      addMapPane("PaneDiocese", zIndex = 410) %>%  # Level 1
-      addMapPane("PaneT0NewBlack", zIndex = 420) %>%  # Level 2
-      addMapPane("paneEcole", zIndex = 430) %>%   # Level 3
-      addMapPane("PaneT0New", zIndex = 440) %>%  # Level 4
-      addMapPane("PaneChefsLieux", zIndex = 450) %>%  # Level 5
+      addMapPane("PaneFondTerrain", zIndex = 410) %>% 
+      addMapPane("PaneFond", zIndex = 420) %>% 
+      addMapPane("PaneDiocese", zIndex = 430) %>%  # Level 1
+      addMapPane("PaneT0NewBlack", zIndex = 440) %>%  # Level 2
+      addMapPane("paneTrsp", zIndex = 450) %>%   # Level 3
+      addMapPane("paneEcole", zIndex = 460) %>%   # Level 4
+      addMapPane("PaneT0New", zIndex = 470) %>%  # Level 5
+      addMapPane("PaneChefsLieux", zIndex = 480) %>%  # Level 6
       hideGroup("hors-selection") %>% 
       hideGroup("Diocèse") %>% 
       hideGroup("Chefs lieux de Diocèse") %>%
-      addProviderTiles(providers$CartoDB.Positron) %>% 
+      addProviderTiles(providers$CartoDB.Positron, options =  pathOptions(pane = "PaneFond",opacity = 0.7)) %>% 
       addPolygons(
         data = st_transform(Diocese1317, crs = 4326),
         stroke = TRUE,
@@ -151,7 +214,7 @@ shinyServer(function(input, output, session) {
         lat = T0Impl$lat,
         lng = T0Impl$lng,
         radius = 1,
-        color = "black",
+        color = "grey",
         stroke = FALSE,
         fillOpacity = 1,
         group = 'hors-selection',
@@ -167,9 +230,28 @@ shinyServer(function(input, output, session) {
       )
   })
   
+  observeEvent(
+    eventExpr = input$map_zoom, {
+      print(input$map_zoom) 
+      if(input$map_zoom < 9){
+          leafletProxy("map", session = session) %>% 
+            addProviderTiles(providers$Esri.WorldTerrain, layerId = "terrain", options = pathOptions(pane = "PaneFondTerrain"))
+      }else{
+        leafletProxy("map", session = session) %>% 
+          removeTiles(layerId= "terrain")
+      }
+    }
+  )
+  
   #Affichage factoides filtré par le graph ----
   observe({
       mapData <- filteredData()
+      labelContent <- lapply(seq(nrow(mapData)), function(i) {
+        paste( "<b>Nom :</b>", mapData[i, "usual_name"], "</br>", 
+                "<b>Diocèse :</b>",mapData[i, "Diocese"], "</br>", 
+               "<b>Modalité :</b>",mapData[i, "modalite"]
+                ) 
+      })
       mapProxy <- leafletProxy("map", session = session)
       mapProxy %>%
         clearGroup('reactive') %>% 
@@ -179,20 +261,13 @@ shinyServer(function(input, output, session) {
           lat = mapData$lat,
           lng = mapData$lng,
           radius = 3,
-          color = ~modaNiv1_Color,
-          stroke = FALSE,
+          color = 'white',
+          opacity = 1,
+          fillColor = ~modaNiv1_Color,
+          stroke = T,
+          weight = 1,
           fillOpacity = 1,
-          # popup = ~paste("<strong>Nom :</strong>", usual_name,"</br>",
-          #                "<strong>Diocèse :</strong>", Diocese,"</br>",
-          #                "<strong>D1 :</strong>", date_start_min,"</br>",
-          #                "<strong>D2 :</strong>", date_start_max,"</br>",
-          #                "<strong>D3 :</strong>", date_stop_min,"</br>",
-          #                "<strong>D4 :</strong>", date_stop_max,"</br>",
-          #                "<strong>caracNew :</strong>",caracNew,"</br>",
-          #                "<strong>Modalité :</strong>",modAgreg,"</br>",
-          #                "<strong>link :</strong>",linked_implantation_name,"</br>",
-          #                "<strong>frequence :</strong>",Freq
-          #                ),
+          label = lapply(labelContent, htmltools::HTML),
           group = 'reactive',
           options = pathOptions(pane = "PaneT0New") 
         )
@@ -201,18 +276,30 @@ shinyServer(function(input, output, session) {
   observe({
     if(!is.null(input$distribPlot_brush)){
       trspData <- filteredTRSPData()
+      labelContent <- lapply(seq(nrow(trspData)), function(i) {
+        paste( "<b>Nom :</b>", trspData[i, "usual_name"], "</br>", 
+               "<b>Diocèse :</b>",trspData[i, "Diocese"], "</br>", 
+               "<b>Modalité :</b>",trspData[i, "modalite"]
+        ) 
+      })
       mapProxy <- leafletProxy("map", session = session, data = trspData)
       mapProxy %>%
         clearGroup('trsp')%>%
         addCircleMarkers(
+          layerId=~idimplantation,
           data = trspData,
           lat = trspData$lat,
           lng = trspData$lng,
           radius = 3,
-          color = ~modaNiv1_Color,
-          stroke = F,
-          fillOpacity = 0.05,
-          group = 'trsp'
+          color = 'white',
+          opacity = 1,
+          fillColor = ~modaNiv1_Color,
+          stroke = T,
+          weight = 1,
+          fillOpacity = 0.1,
+          label = lapply(labelContent, htmltools::HTML),
+          group = 'trsp',
+          options = pathOptions(pane = "paneTrsp") 
         )
     }
   })
@@ -286,33 +373,41 @@ shinyServer(function(input, output, session) {
   
   #Affichage legende section affichage ----
   
-  observe({
-    if(input$conf=="Statuts"){
-      show(id = 'statLegend')
-    }else{
-      hide(id = 'statLegend')
-    }})
+  onclick(id = "statToggle", c(toggleClass(id = "statLegend", class = "show")), add = FALSE)
   
   observe({
-    if(input$conf=="Ordres"){
-      show(id = 'ordrLegend')
-    }else{
-      hide(id = 'ordrLegend')
-    }})
+    toggleClass(id = "statLegend", class = "hide",
+                condition = input$conf=="Statuts")
+    toggleClass(id = "statLegendBoxes", class = "show",
+                condition = input$conf=="Statuts")
+  })
+  
+  onclick(id = "ordrToggle", c(toggleClass(id = "ordrLegend", class = "show")), add = FALSE)
   
   observe({
-    if(input$conf=="Observance"){
-      show(id = 'obsLegend')
-    }else{
-      hide(id = 'obsLegend')
-    }})
+    toggleClass(id = "ordrLegend", class = "hide",
+                condition = input$conf=="Ordres")
+    toggleClass(id = "ordrLegendBoxes", class = "show",
+                condition = input$conf=="Ordres")
+  })
+  
+  onclick(id = "obsToggle", c(toggleClass(id = "obsLegend", class = "show")), add = FALSE)
   
   observe({
-    if(input$conf=="Type de communauté"){
-      show(id = 'commLegend')
-    }else{
-      hide(id = 'commLegend')
-    }})
+    toggleClass(id = "obsLegend", class = "hide",
+                condition = input$conf=="Observance")
+    toggleClass(id = "obsLegendBoxes", class = "show",
+                condition = input$conf=="Observance")
+  })
+  
+  onclick(id = "commToggle", c(toggleClass(id = "commLegend", class = "show")), add = FALSE)
+  
+  observe({
+    toggleClass(id = "commLegend", class = "hide",
+                condition = input$conf=="Type de communauté")
+    toggleClass(id = "commLegendBoxes", class = "show",
+                condition = input$conf=="Type de communauté")
+  })
   
   
   
@@ -320,10 +415,21 @@ shinyServer(function(input, output, session) {
   #Sortie graph----
   output$distribPlot <- renderPlot({
     
+    T0NewSel <- filter(T0New, modAgreg %in% c(input$Obsc,
+                                              input$Ordrc,
+                                              input$Statc,
+                                              input$Ecolc,
+                                              input$Commc,
+                                              input$Relc))
+    
+    idImplSel <- unique(T0NewSel$idimplantation)
+    T0NewSel <- filter(T0New, idimplantation %in% idImplSel)
+    
+    currentlyFiltered <- checkboxFilter(T0NewSel)
     
     # distribPlot <- ggplot(T0New,aes(date_start_min)) +
     #   geom_density(col = colorAttr, fill = colorAttr, alpha = 0.3, adjust = 0.75)
-    distribPlot <- graphique_tapis(carac = input$conf, T0New = T0New)
+    distribPlot <- graphique_tapis(carac = input$conf, T0New = currentlyFiltered)
     
     
     if(!is.null(nrow(filteredSpatialData())) && nrow(filteredSpatialData())> 1){
