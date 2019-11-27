@@ -20,11 +20,14 @@ ChefLieu1317 <- readRDS("ChefLieu1317.Rds")
 Diocese1317 <- readRDS("Diocese1317.Rds")
 
 T0New <- readRDS("T0NewBase.Rds")
+# T0New <- readRDS("Data/T0New20191120.Rds")
+
+
 CaracHist<-readRDS(file = "CaracHist.Rds")
 
-T0New <- merge(select(CaracHist,modalite,modaNiv1, modaNiv1_Color), T0New, by.x="modalite",by.y="modalite")
+T0New <- merge(select(CaracHist,modalite, modaNiv1, modaNiv1_Color), T0New, by.x="modalite",by.y="modalite")
 
-T0impl <- readRDS("T0Impl.Rds")
+T0Impl <- readRDS("T0Impl.Rds")
 
 Liens <- readRDS("liens.Rds")
 
@@ -92,7 +95,7 @@ graphique_tapis <- function(carac,T0New){
     summarise (dateminPdV=min(date_start_min,na.rm=TRUE),
                datemaxPdV=max(date_stop_max,na.rm=TRUE),
                nbEtats=n()) %>% 
-    left_join(T0impl,by="idimplantation")
+    left_join(T0Impl,by="idimplantation")
   
   ###########proto Algo
   DateAmpl<-50   # amplitude des classes
@@ -209,6 +212,18 @@ chronogramme <- function(idimpl){
   return(p)
 }
 
+
+showPopup <- function(id, lat, lng) {
+  chrngr <- chronogramme(id)
+  svg(filename= paste(folder,"plot.svg", sep = "/"), 
+      width = 400*0.01 , height = 200*0.01 )
+  print(chrngr)
+  dev.off()
+  
+  content <- paste(readLines(paste(folder,"plot.svg",sep="/")), collapse = "")
+  
+  leafletProxy("map") %>% addPopups(lng, lat, content, layerId = id, options = popupOptions(maxWidth = 500))
+}
 
 
 
