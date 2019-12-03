@@ -31,42 +31,13 @@ shinyUI(fluidPage(
                        overflow-wrap: break-word;
                       }
 
-                       #statLegend{
+                       .Legend{
                        background-color: #ECEDE7;
                        padding: 10px;
                        margin: 5px;
                        }
-                       #ordrLegend{
-                       background-color: #ECEDE7;
-                       padding: 10px;
-                       margin: 5px;
-                       }
-                       #obsLegend{
-                       background-color: #ECEDE7;
-                       padding: 10px;
-                       margin: 5px;
-                       }
-                       #commLegend{
-                       background-color: #ECEDE7;
-                       padding: 10px;
-                       margin: 5px;
-                       }
-                       #statLegendBoxes{
-                       background-color: #ECEDE7;
-                       padding: 10px;
-                       margin: 5px;
-                       }
-                       #ordrLegendBoxes{
-                       background-color: #ECEDE7;
-                       padding: 10px;
-                       margin: 5px;
-                       }
-                       #obsLegendBoxes{
-                       background-color: #ECEDE7;
-                       padding: 10px;
-                       margin: 5px;
-                       }
-                       #commLegendBoxes{
+                       
+                       .LegendBoxes{
                        background-color: #ECEDE7;
                        padding: 10px;
                        margin: 5px;
@@ -77,36 +48,12 @@ shinyUI(fluidPage(
                        .hide{
                        display: none !important
                        }
-                       #statToggle{
-                       fill: #FB7E47;
-                       cursor:pointer
-                       }
-                       #ordrToggle{
-                       fill: #FB7E47;
-                       cursor:pointer
-                       }
-                       #obsToggle{
-                       fill: #FB7E47;
-                       cursor:pointer
-                       }
-                       #commToggle{
+                       .Toggle{
                        fill: #FB7E47;
                        cursor:pointer
                        }
                       
-                       #statLegendBoxes label{
-                       font-weight: 100;
-                       margin: 0
-                       }
-                       #ordrLegendBoxes label{
-                       font-weight: 100;
-                       margin: 0
-                       }
-                       #obsLegendBoxes label{
-                       font-weight: 100;
-                       margin: 0
-                       }
-                       #commLegendBoxes label{
+                       .LegendBoxes label{
                        font-weight: 100;
                        margin: 0
                        }
@@ -221,226 +168,38 @@ shinyUI(fluidPage(
     
     
     # Sidebar panel for inputs ----
-        HTML(
-          '
-            <div id="filter">
-              <div id="filterContent">
-                <h2>Filtres</h2>'
-          ),
-             bsCollapse(multiple = T, 
-                        open = c("Statuts","Ordres","Observance","Type de communauté","École","Relations"),
-                        bsCollapsePanel("Statuts",
-                                        checkboxGroupInput("Statc",
-                                                           label = NULL,
-                                                           choices = listStat,
-                                                           selected = listStat)
-                                        , style = "default"),
-                        bsCollapsePanel("Ordres",
-                                        checkboxGroupInput("Ordrc",
-                                                           label = NULL,
-                                                           choices = listOrdr,
-                                                           selected = listOrdr)
-                                        , style = "default"),
-                        bsCollapsePanel("Observance",
-                                        checkboxGroupInput("Obsc",
-                                                           label = NULL,
-                                                           choices = listObs,
-                                                           selected = listObs)
-                                        , style = "default"),
-                        bsCollapsePanel("Type de communauté",
-                                        checkboxGroupInput("Commc",
-                                                           label = NULL,
-                                                           choices = listComm,
-                                                           selected = listComm)
-                                        , style = "default"),
-                        bsCollapsePanel("École",
-                                        checkboxGroupInput("Ecolc",
-                                                           label = NULL,
-                                                           choices = listEcol,
-                                                           selected = listEcol)
-                                        , style = "default"),
-                        bsCollapsePanel("Relations",
-                                        checkboxGroupInput("Relc",
-                                                           label = NULL,
-                                                           choices = listRel,
-                                                           selected = listRel)
-                                        , style = "default")
-             
-               
-            ),
-    HTML('</div>
-        <div id="arrowFilter">
+    HTML('
+        <div id="filter">
+          <div id="filterContent">
+            <h2>Filtres</h2>
+    '),
+    uiOutput("filterContentUI"),
+
+    HTML('
+          </div>
+          <div id="arrowFilter">
              <svg height="60" width="10" fill= #FB7E47 >
              <polygon points="10 64, 10 0, 0 32" id="statArrowOn" class style = " display: block;"/>
              </svg>
           </div>
         </div>
-          <div id = "affichage">
+
+<!--2nd panel for filtering display-->
+        <div id = "affichage">
           <h2>Affichage</h2>
-              <div class="attr-col shiny-input-radiogroup" id="conf">
-              
-                   <input type="radio" id="Statuts" name="conf" value="Statuts" checked= "checked"/>
-                   <label for="Statuts">Statuts</label>
-                   
-                   <svg height="10" width="10">
-                        <polygon points="0 0, 10 0, 10 10, 0 10" id="statToggle"/>
-                   </svg>
-                   
-                   <br/>
-                   
-                   <div id = "statLegend" class style = " display: none;" >
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#a50f15" /></svg>
-                        <p>Régulier </p>
-                        </br>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#377eb8" /></svg>
-                        <p> Séculier </p>
-                        </br>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#8da0cb" /></svg>
-                        <p> Séculier-communautaire </p>
-                        </br>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#999999" /></svg>
-                        <p> Autres </p>
-                   </div>
-                   
-                   <div id = "statLegendBoxes" class style = " display: none;" >
-                        <input type="checkbox" id="Régulier" name="Régulier" checked>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#a50f15" /></svg> 
-                        <label for="Régulier">Régulier</label>
-                        </br>
-                        <input type="checkbox" id="Séculier" name="Séculier" checked>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#377eb8" /></svg>
-                        <label for="Séculier">Séculier</label>
-                        </br>
-                        <input type="checkbox" id="Séculiercommunautaire" name="Séculiercommunautaire" checked>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#8da0cb" /></svg>
-                        <label for="Séculiercommunautaire">Séculier-communautaire</label>
-                        </br>
-                        <input type="checkbox" id="Autres" name="Autres" checked>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#999999" /></svg>
-                        <label for="Autres">Autres</label>
-                   </div>
-                   
-                   <input type="radio" id="Ordres" name="conf" value="Ordres"  />
-                   <label for="Ordres">Ordres</label>
-                   
-                   <svg height="10" width="10">
-                        <polygon points="0 0, 10 0, 10 10, 0 10" id="ordrToggle" />
-                   </svg>
-                   <br/>
-                   
-                   <div id = "ordrLegend" class style = " display: none;" >
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#ffffb3" /></svg>
-                        <p> Bénédictins </p>
-                        </br>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#fb8072" /></svg>
-                        <p> Chanoines-réguliers </p>
-                        </br>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#fdb462" /></svg>
-                        <p> Monachisme-érémitique </p>
-                        </br>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#80b1d3" /></svg>
-                        <p> Hospitalier et militaire </p>
-                        </br>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#8dd3c7" /></svg>
-                        <p> Mendiants </p>
-                        </br>
-                        <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#bebada" /></svg>
-                        <p> Clercs-régulier </p>
-                   </div>
-                   
-                   <div id = "ordrLegendBoxes" class style = " display: none;" >
-                         <input type="checkbox" id="Bénédictins" name="Bénédictins"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#ffffb3" /></svg>
-                         <label for="Bénédictins">Bénédictins</label>
-                         </br>
-                         <input type="checkbox" id="Chanoinesréguliers" name="Chanoinesréguliers"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#fb8072" /></svg>
-                         <label for="Chanoinesréguliers">Chanoines-réguliers</label>
-                         </br>
-                         <input type="checkbox" id="Monachismeérémitique" name="Monachismeérémitique"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#fdb462" /></svg>
-                         <label for="Monachismeérémitique">Monachisme-érémitique</label>
-                         </br>
-                         <input type="checkbox" id="Hospitalieretmilitaire" name="Hospitalieretmilitaire"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#80b1d3" /></svg>
-                         <label for="Hospitalieretmilitaire">Hospitalier et militaire</label>
-                         </br>
-                         <input type="checkbox" id="Mendiants" name="Mendiants"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#8dd3c7" /></svg>
-                         <label for="Mendiants">Mendiants</label>
-                         </br>
-                         <input type="checkbox" id="Clercsrégulier" name="Clercsrégulier"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#bebada" /></svg>
-                         <label for="Clercsrégulier">Clercs-régulier</label>
-                   </div>
-                   
-                   
-                   <input type="radio" id="Observance" name="conf" value="Observance" />
-                   <label for="Observance">Observance</label>
-                   <svg height="10" width="10">
-                         <polygon points="0 0, 10 0, 10 10, 0 10" id="obsToggle" />
-                   </svg>
-                   <br/>
-                   
-                   <div id = "obsLegend" class style = " display: none;" >
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#883799" /></svg>
-                         <p> Coutumiers </p>
-                         </br>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#7A3B1A" /></svg>
-                         <p> Règles </p>
-                   </div>
-                   
-                   <div id = "obsLegendBoxes" class style = " display: none;" >
-                         <input type="checkbox" id="Coutumiers" name="Coutumiers"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#883799" /></svg>
-                         <label for="Coutumiers">Coutumiers</label>
-                         </br>
-                         <input type="checkbox" id="Règles" name="Règles"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="#7A3B1A" /></svg>
-                         <label for="Règles">Règles</label>
-                   </div>
-                   
-                   <input type="radio" id="Type de communauté" name="conf" value="Type de communauté" />
-                   <label for="Type de communauté">Type de communauté</label>
-                   <svg height="10" width="10">
-                         <polygon points="0 0, 10 0, 10 10, 0 10" id="commToggle" />
-                   </svg>
-                   </br>
-                   
-                   <div id = "commLegend" class style = " display: none;" >
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="turquoise" /></svg>
-                         <p> Masculine </p>
-                         </br>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="thistle" /></svg>
-                         <p> Double </p>
-                         </br>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="violet" /></svg>
-                         <p> Féminine </p>
-                   </div>
-                   
-                   <div id = "commLegendBoxes" class style = " display: none;" >
-                         <input type="checkbox" id="Masculine" name="Masculine"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="turquoise" /></svg>
-                         <label for="Masculine">Masculine</label>
-                         </br>
-                         <input type="checkbox" id="Double" name="Double"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="thistle" /></svg>
-                         <label for="Double">Double</label>
-                         </br>
-                         <input type="checkbox" id="Féminine" name="Féminine"checked>
-                         <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="violet" /></svg>
-                         <label for="Féminine">Féminine</label>
-                   </div>
-              
-              </div>
-              
-              <input type="checkbox" id="EcolR" name="École" >
-              <b>École</b>
-              <div id = "ecoleLegend" class style = " display: none;"  >
-                   <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="grey" /></svg>
-                   <p>École</p>
-              </div> 
-              </br>
+          <div class="attr-col shiny-input-radiogroup" id="conf">
+                    '),
+    uiOutput("affichageUI"),
+    
+        HTML('
+             </div>  
+             <input type="checkbox" id="EcolR" name="École" >
+             <b>École</b>
+             <div id = "ecoleLegend" class = "Legend" style = " display: none;"  >
+                <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="grey" /></svg>
+                <p>École</p>
+             </div> 
+             </br>
               <input type="checkbox" id="RelR" name="Relations" >
               <b>Relations</b>
               <div id = "lineLegend" class style = " display: none;"  >
@@ -457,40 +216,57 @@ shinyUI(fluidPage(
                     <p>X</p>
               </div>
          </div>
-     '
-    ),
-    # Main panel for displaying outputs ----
-    HTML('<div id= "content">'),
-           absolutePanel(id = "panelEtat",
-                         class = "panel panel-default",
-                         radioButtons("etat","",
-                                      choiceNames = list(
-                                        HTML("<b>État final</b>"),
-                                        HTML("<b>État initial</b>"),
-                                        HTML("<b>État dominant</b>")
-                                      ),
-                                      choiceValues = list(
-                                        "État final",
-                                        "État initial",
-                                        "État dominant"))),
-           absolutePanel(top = "1%",
-                         right = "1%",
-                         left = "87%",
-                         class = "panel panel-default",
-                         style = "padding : 0 10px; overflow-wrap: break-word;
-                         z-index: 1;",
-                         htmlOutput("selAttr"),
-                         htmlOutput("selTemp"),
-                         htmlOutput("selSpat")),
-           leafletOutput("map", height = "60vh", width = "100%"),
-           # plotOutput("distribPlot", 
-           #            height = "37vh",
-           #            brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE, fill = colorTempo, stroke = colorTempo)),
-           plotOutput("distribPlot", height = "40vh", width = "100%",
-                      brush = brushOpts(id = "distribPlot_brush", direction = "x", resetOnNew = FALSE,fill = "black")),
-                  # HTML('<div id="distribPlot" class="shiny-plot-output"
-                  #       style="width: 100%; height: 40vh"></div>'),
-        HTML('</div>')
+
+<!--Main panel for displaying outputs-->
+
+         <div id= "content">
+              <div style="position:absolute;cursor:inherit;" id="panelEtat" class="panel panel-default">
+                <div id="etat" class="form-group shiny-input-radiogroup shiny-input-container">
+                  <label class="control-label" for="etat"></label>
+                  <div class="shiny-options-group">
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="etat" value="État final" checked="checked"/>
+                        <span><b>État final</b></span>
+                      </label>
+                    </div>
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="etat" value="État initial"/>
+                        <span><b>État initial</b></span>
+                      </label>
+                    </div>
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="etat" value="État dominant"/>
+                        <span><b>État dominant</b></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel panel-default" style="top:1%;left:87%;right:1%;position:absolute;cursor:inherit; padding : 0 10px; overflow-wrap: break-word;&#10;                         z-index: 1;">
+                <div id="selAttr" class="shiny-html-output"></div>
+                <div id="selTemp" class="shiny-html-output"></div>
+                <div id="selSpat" class="shiny-html-output"></div>
+              </div>
+             '),
+        leafletOutput("map", height = "60vh", width = "100%"),
+        HTML('
+              <div id="distribPlot" 
+                   class="shiny-plot-output" 
+                   style="width: 100% ; height: 40vh" 
+                   data-brush-id="distribPlot_brush" 
+                   data-brush-fill="black" 
+                   data-brush-stroke="#036" 
+                   data-brush-opacity="0.25" 
+                   data-brush-delay="300" 
+                   data-brush-delay-type="debounce" 
+                   data-brush-clip="TRUE" 
+                   data-brush-direction="x" 
+                   data-brush-reset-on-new="FALSE">
+              </div>
+             </div>')
               )
             )
         )

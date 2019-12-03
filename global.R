@@ -15,17 +15,63 @@ options(encoding = "UTF-8")
 folder <- tempfile()
 dir.create(folder)
 
+###################################
+#     CHANGEMENTS DE DONNEES      #
+###################################
+color <- "modaNiv1_Color"
+
+carac <- "caracNew"
+
+### Granularité modaniv 2 // dec 19
+      modalite <- "modaNiv1"
+      donnee <- readRDS("Data/T0New20191202.Rds")
+
+      Ecole <- donnee[donnee[[carac]] %in%  "École", ]
+
+      donnee <- donnee[donnee[[carac]] %in%  c("Observance","Ordres","Statuts","Type de communauté"), ]
+
+      CaracHist<-read.csv(file = "Data/NewModelCaracModalitesColor3.csv", header = TRUE, sep = ",", stringsAsFactors=FALSE)
+      donnee <- merge(select(CaracHist,modalite, modaNiv1_Color), donnee, by.x="modalite",by.y="modalite")
+
+
+### Granularité modaniv 2 // nov 19
+      # modalite <- "modaNiv2"
+      # donnee <- readRDS("Data/T0New20191120.Rds")
+      # 
+      # Ecole <- donnee[donnee[[carac]] %in%  "École", ]
+      # 
+      # donnee <- donnee[donnee[[carac]] %in%  c("Observance","Ordres","Statuts","Type de communauté"), ]
+      # 
+      # CaracHist<-read.csv(file = "Data/NewModelCaracModalitesColor3.csv", header = TRUE, sep = ",", stringsAsFactors=FALSE)
+      # donnee <- merge(select(CaracHist,modalite, modaNiv1_Color), donnee, by.x="modalite",by.y="modalite")
+
+
+     
+### Granularité modAgreg
+      # modalite <- "modAgreg"
+      # donnee <- readRDS("T0NewBase.Rds")
+      # 
+      # Ecole <- donnee[donnee[[carac]] %in%  "École", ]
+      # 
+      # donnee <- donnee[donnee[[carac]] %in%  c("Observance","Ordres","Statuts","Type de communauté"), ]
+      # 
+      # CaracHist<-readRDS(file = "CaracHist.Rds")
+      # donnee <- merge(select(CaracHist,modalite, modaNiv1, modaNiv1_Color), donnee, by.x="modalite",by.y="modalite")
+
+
+
+
+
+# donnee <- merge(select(CaracHist,modalite, modaNiv1, modaNiv1_Color), donnee, by.x="modalite",by.y="modalite")
+
+
+###################################
+
+
+
 ChefLieu1317 <- readRDS("ChefLieu1317.Rds")
 
 Diocese1317 <- readRDS("Diocese1317.Rds")
-
-T0New <- readRDS("T0NewBase.Rds")
-# T0New <- readRDS("Data/T0New20191120.Rds")
-
-
-CaracHist<-readRDS(file = "CaracHist.Rds")
-
-T0New <- merge(select(CaracHist,modalite, modaNiv1, modaNiv1_Color), T0New, by.x="modalite",by.y="modalite")
 
 T0Impl <- readRDS("T0Impl.Rds")
 
@@ -33,38 +79,8 @@ Liens <- readRDS("liens.Rds")
 
 Ecole <- readRDS("ecole.Rds")
 
-#liste input
-listObs <- list("Coutumiers",
-                "Règles")
 
-listOrdr <- list("Bénédictins",
-                 "Chanoines réguliers",
-                 "Monachisme érémitique",
-                 "Hospitaliers et militaires",
-                 "Mendiants",
-                 "Clercs réguliers")
 
-listStat <- list("Régulier",
-                 "Séculier",
-                 "Séculier communautaire",
-                 "Autre")
-
-listEcol <- list("École dépendante",
-                 "École capitulaire",
-                 "École du monastère")
-
-listComm <- list("Masculine",
-                 "Double",
-                 "Féminine")
-
-listRel <- list("A",
-                "D",
-                "H",
-                "C")
-
-colorSpat <- "#9B372F"
-colorAttr <- "#9C7B36"
-colorTempo <- "#294B59"
 
 #Couleur links
 Liens$modAgreg <- as.factor(Liens$modAgreg)
@@ -73,22 +89,22 @@ liensPal <- colorFactor(c("#8976B5","#CF6529","#5CA866","#69583E"),Liens$modAgre
 
 #Fonctions ----
 
-graphique_tapis <- function(carac,T0New){
+# Pdv <- "Observance"
+
+graphique_tapis <- function(Pdv,donnee){
   
-  T0NewTapis<-T0New %>% 
+  T0NewTapis<-donnee %>% 
     mutate(date_stopC=ifelse(date_stopC>1800,1800,date_stopC)) %>% 
     mutate(date_stopC=ifelse(date_stopC==date_startC,date_stopC+5,date_stopC)) %>% #pour y voir qqchose
     mutate(dateC=(date_stopC+date_startC)/2)  #pour l'utilisation de linerange dasn ggplot
   
   ListemodT0<-T0NewTapis %>% 
-    group_by(caracNew,modaNiv1,modalite) %>% 
+    group_by(T0NewTapis[[carac]],modaNiv1,modalite) %>% 
     summarise(n=n())
   ListeMod<-CaracHist
   
-  #########Choix du point de vue= Carac
-  PdV=carac
-  
-  TPdV<-filter(T0NewTapis,caracNew==PdV)
+  # TPdV<-filter(T0NewTapis,caracNew==Pdv)
+  TPdV <- T0NewTapis[T0NewTapis[[carac]] == Pdv, ]
   
   TPdVimpl<-TPdV %>% 
     group_by(idimplantation) %>% 
@@ -103,11 +119,11 @@ graphique_tapis <- function(carac,T0New){
   
   #initialisation fichier de W
   TPdVW<-TPdV %>% 
-    mutate (modaW=modaNiv1) #Choix de travail sur modNiv2 de catégories de caracNew
+    mutate (modaW=!!sym(modalite)) #Choix de travail sur modNiv2 de catégories de caracNew
   TPdVW$idimplantation<-as.factor(TPdVW$idimplantation)
   
-  couleur<-filter(CaracHist,caracNew==PdV) %>% 
-    mutate(modaW=modaNiv1,modaW_Color=modaNiv1_Color) %>% 
+  couleur<-filter(CaracHist,CaracHist[[carac]]==Pdv) %>% 
+    mutate(modaW=!!sym(modalite),modaW_Color=modaNiv1_Color) %>% 
     group_by(modaW,modaW_Color) %>% 
     summarise(nmodalite=n()) %>% 
     ungroup()
@@ -166,15 +182,15 @@ graphique_tapis <- function(carac,T0New){
 
 chronogramme <- function(idimpl){
   
-  T0NewTapis<-T0New %>% 
+  T0NewTapis<-donnee %>% 
     mutate(date_stopC=ifelse(date_stopC>1800,1800,date_stopC)) %>% 
     mutate(date_stopC=ifelse(date_stopC==date_startC,date_stopC+5,date_stopC)) %>% #pour y voir qqchose
-    mutate(dateC=(date_stopC+date_startC)/2)  #pour l'utilisation de linerange dasn ggplot
+    mutate(dateC=(date_stopC+date_startC)/2)  #pour l'utilisation de linerange dasn ggplot 
   
   
-  coulChro<-T0New %>% 
-    mutate(modaW=modaNiv1,modaW_Color=modaNiv1_Color) %>% 
-    group_by(caracNew,modaW,modaW_Color) %>% 
+  coulChro<-donnee %>% 
+    mutate(modaW=!!sym(modalite),modaW_Color=!!sym(color)) %>% 
+    group_by(!!sym(carac),modaW,modaW_Color) %>% 
     summarise(nmodalite=n()) %>% 
     ungroup()
   
@@ -182,14 +198,16 @@ chronogramme <- function(idimpl){
   names(colsChro)<-coulChro$modaW
   
   
-  T0_1impl<-filter(T0NewTapis,idimplantation==idimpl) %>% 
-    filter(caracNew != "Relations")
+  T0_1impl<-filter(T0NewTapis,idimplantation==idimpl)
   
+  
+  # T0_1impl<-filter(T0NewTapis,idimplantation==idimpl) %>% 
+  #   filter(T0NewTapis[[carac]] != "Relations")
   
   titre<-paste(T0_1impl$usual_name[1]," (",T0_1impl$idimplantation[1],")",sep="")
   
   
-  p<- ggplot(T0_1impl,aes(caracNew,dateC,colour=str_wrap(modaNiv1,10)))+
+  p<- ggplot(T0_1impl,aes_string(carac,"dateC",colour=modalite))+
     ggtitle(titre)+
     geom_linerange(aes(ymin=date_startC,ymax=date_stopC),size=7)+
     scale_y_continuous(name="Date",breaks=seq(500,1900,200))+

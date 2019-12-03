@@ -1,0 +1,139 @@
+caracNew,modalite,modaNiv1,modaNiv1_Color,modaNiv2_Color,modaNiv2,ModaNiv2remarques
+École,École capitulaire,École capitulaire,#66c2a5,#66c2a5,École capitulaire,École capitulaire
+École,Autre - École dépendante,École dépendante,#fc8d62,#fc8d62,École dépendante,École dépendante
+École,École du monastère,École du monastère,#8da0cb,#8da0cb,École du monastère,École du monastère
+Événements,Disparition - Changement de site,Disparition,#6B6B6B,#6B6B6B,Disparition,Disparition
+Événements,Disparition - Destruction,Disparition,#6B6B6B,#6B6B6B,Disparition,Disparition
+Événements,Disparition - Disparition (causes non précisées),Disparition,#6B6B6B,#6B6B6B,Disparition,Disparition
+Événements,Disparition - Dissolution,Disparition,#6B6B6B,#6B6B6B,Disparition,Disparition
+Événements,Fondation,Fondation,#2BE038,#2BE039,Fondation,Fondation
+Événements,Refondation,Refondation,#105415,#105416,Fondation,Fondation
+Événements,Réforme,Réforme,#151559,#151560,Réforme simple,Réforme simple (sans conséquence institutionnelle)
+Événements,Réforme statutaire,Réforme statutaire,#671DA3,#671DA4,Réforme statutaire,Réforme statutaire
+Événements,Régularisation,Régularisation,#2B9ACE,#2B9ACE,Régularisation,Régularisation
+Événements,Sécularisation,Sécularisation,#2B4CCE,#2B4CCE,Sécularisation,Sécularisation
+Événements,Sécularisation communautaire,Sécularisation communautaire,#122057,#122058,Sécularisation communautaire,Sécularisation communautaire
+Observance,2e règle des Pères,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Codex regularum de Benoît d'Aniane,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Concordia regularum de Benoît d'Aniane,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Institutio canonicorum (816),Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle d'Aix (817),Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle de Grandmont,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle de l'ordre de Saint-Jean de Jérusalem,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle de l'ordre du Temple,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle de Macaire,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle de saint Colomban,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle de Walbert,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle des quatre Pères,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle du Temple,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle mixte,Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Règle orientale (anonyme de Condat ?),Règles,#6B422F,#6B422F,Autre règle,Autre règle
+Observance,Praeceptum d'Augustin,Règles,#6B422F,#6B422F,Praeceptum d'Augustin,Praeceptum d'Augustin
+Observance,Règle de saint Benoît,Règles,#6B422F,#6B422F,Règle de saint Benoît,Règle de saint Benoît
+Observance,Bernardi Consuetudines Cluniacenses,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Observance,Consuetudines cartusiae,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Observance,Consuetudines Cestrenses,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Observance,Consuetudines Cluniacenses antiquiores A,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Observance,Consuetudines Cluniacenses antiquiores B,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Observance,Coutumier d'Ulrich,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Observance,Ecclesiastica Officia cisterciens,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Observance,Liber ordinis Sancti Ruffi,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Observance,Liber tramitis,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Observance,Synode d'Aix-la-Chapelle,,#A500AD,#A500AD,,supprimer tous les Coutumiers
+Ordres,Hospitaliers et militaires - Antonins (Saint-Antoine en Viennois),Hospitaliers et militaires,#80b1d3,#80b1d3,Antonins,Antonins
+Ordres,Monachisme érémitique - Autonome,Monachisme érémitique,#fdb462,#fdb462,Autre monachisme érémitique,Autre monachisme érémitique
+Ordres,Monachisme érémitique - Chalais (Chalaisiens),Monachisme érémitique,#fdb462,#fdb462,Autre monachisme érémitique,Autre monachisme érémitique
+Ordres,Monachisme érémitique - Val-des-Choux,Monachisme érémitique,#fdb462,#fdb462,Autre monachisme érémitique,Autre monachisme érémitique
+Ordres,Bénédictins - Autonome,Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Bénédictins - Carmélites,Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Bénédictins - Fleury (Fleurisiens),Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Bénédictins - Fontevraud (Fontevristes),Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Bénédictins - Gorze,Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Bénédictins - La Chaise-Dieu,Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Bénédictins - Marmoutier,Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Bénédictins - Saint-Chaffre du Monastier (Chaffrien),Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Bénédictins - Saint-Victor de Marseille,Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Bénédictins - Saint-Michel de la Chiusa,Bénédictins,#ffffb3,#ffffb3,Autres bénédictins,Autres bénédictins
+Ordres,Chanoines réguliers - Abondance,Chanoines réguliers,#fb8072,#fb8072,Autres chanoines réguliers,Autres chanoines réguliers
+Ordres,Chanoines réguliers - Augustins,Chanoines réguliers,#fb8072,#fb8072,Autres chanoines réguliers,Autres chanoines réguliers
+Ordres,Chanoines réguliers - Autonome,Chanoines réguliers,#fb8072,#fb8072,Autres chanoines réguliers,Autres chanoines réguliers
+Ordres,Chanoines réguliers - Génovéfains,Chanoines réguliers,#fb8072,#fb8072,Autres chanoines réguliers,Autres chanoines réguliers
+Ordres,Chanoines réguliers - Grand Saint-Bernard,Chanoines réguliers,#fb8072,#fb8072,Autres chanoines réguliers,Autres chanoines réguliers
+Ordres,Chanoines réguliers - Oulx,Chanoines réguliers,#fb8072,#fb8072,Autres chanoines réguliers,Autres chanoines réguliers
+Ordres,Chanoines réguliers - St-Jérôme,Chanoines réguliers,#fb8072,#fb8072,Autres chanoines réguliers,Autres chanoines réguliers
+Ordres,Chanoines réguliers - Val-des-Écoliers,Chanoines réguliers,#fb8072,#fb8072,Autres chanoines réguliers,Autres chanoines réguliers
+Ordres,Chanoines réguliers - Trinitaires (ou Mathurins),Chanoines réguliers,#fb8072,#fb8072,Autres chanoines réguliers,Autres chanoines réguliers
+Ordres,Hospitaliers et militaires - Teutoniques,Hospitaliers et militaires,#80b1d3,#80b1d3,autres hospitaliers et militaires,autres hospitaliers et militaires
+Ordres,Chanoines réguliers - Arrouaise,Chanoines réguliers,#fb8072,#fb8072,Chanoines réguliers - Arrouaise,Arrouaise
+Ordres,Chanoines réguliers - Prémontrés,Chanoines réguliers,#fb8072,#fb8072,Chanoines réguliers - Prémontrés,Prémontrés
+Ordres,Chanoines réguliers - Saint-Ruf,Chanoines réguliers,#fb8072,#fb8072,Chanoines réguliers - Saint-Ruf,Saint-Ruf
+Ordres,Monachisme érémitique - Chartreux (La Grande Chartreuse),Monachisme érémitique,#fdb462,#fdb462,Chartreux,Chartreux
+Ordres,Bénédictins - Cisterciens (Cîteaux),Bénédictins,#ffffb3,#ffffb3,Cisterciens,Cisterciens
+Ordres,Clercs réguliers - Autonome,Clercs réguliers,#bebada,#bebada,Clercs réguliers,regrouper tous les clercs réguliers
+Ordres,Clercs réguliers - Jésuites,Clercs réguliers,#bebada,#bebada,Clercs réguliers,regrouper tous les clercs réguliers
+Ordres,Bénédictins - Clunisiens (Cluny),Bénédictins,#ffffb3,#ffffb3,Clunisiens,Clunisiens
+Ordres,Monachisme érémitique - Grandmont (Grandmontains),Monachisme érémitique,#fdb462,#fdb462,Grandmontains,Grandmontains
+Ordres,Hospitaliers et militaires - Hospitaliers-du-Saint-Esprit,Hospitaliers et militaires,#80b1d3,#80b1d3,Hospitaliers,Hospitaliers
+Ordres,Hospitaliers et militaires - Hospitaliers de Saint-Jean de Jérusalem,Hospitaliers et militaires,#80b1d3,#80b1d3,Hospitaliers,Hospitaliers
+Ordres,Hospitaliers et militaires - Hospitaliers de Saint-Lazare (Lazarites),Hospitaliers et militaires,#80b1d3,#80b1d3,Hospitaliers,Hospitaliers
+Ordres,Mendiants,Mendiants,#8dd3c7,#8dd3c7,Mendiant,regrouper tous les Mendiants (modalité changée à Mendiants-Franciscains)regrouper tous les Mendiants (modalité changée à Mendiants-Franciscains)regrouper tous les Mendiants (modalité changée à Mendiants-Franciscains)regrouper tous les Mendiants (modalité changée à Mendiants-Franciscains)regrouper tous les Mendiants (modalité changée à Mendiants-Franciscains)
+Ordres,Mendiants - Dominicains,Mendiants,#8dd3c7,#8dd3c7,Mendiant,regrouper tous les Mendiants
+Ordres,Mendiants - Minimes,Mendiants,#8dd3c7,#8dd3c7,Mendiant,regrouper tous les Mendiants
+Ordres,Mendiants - Franciscains,Mendiants,#8dd3c7,#8dd3c7,Mendiant,regrouper tous les Mendiants
+Ordres,Chanoines réguliers - Victorins (Saint-Victor de Paris),Chanoines réguliers,#fb8072,#fb8072,Saint-Victor,Saint-Victor
+Ordres,Hospitaliers et militaires - Templiers,Hospitaliers et militaires,#80b1d3,#80b1d3,Templiers ,Templiers 
+Ordres,Hospitaliers et militaires - Autonome,Hospitaliers et militaires,#80b1d3,#80b1d3,,!!! Modalité n'existe pas (=erreur de Xavier)
+Statuts,Autre - Incertain,Autre,#999999,#999999,Indéfini,Indéfini
+Statuts,Autre - Indéterminé,Autre,#999999,#999999,Indéfini,Indéfini
+Statuts,Autre - Villa,Profane,#999999,#4daf4a,Profane,Profane
+Statuts,Curtis,Profane,#999999,#4daf4a,Profane,Profane
+Statuts,Régulier - Chapitre cathédral régulier,Régulier canonial,#ff7f00,#ff7f00,Régulier canonial,Régulier canonial
+Statuts,Régulier - Chapitre collégial régulier,Régulier canonial,#ff7f00,#ff7f00,Régulier canonial,Régulier canonial
+Statuts,Régulier - Communauté d'ermites,Régulier érémitique,#a6761d,#a6761d,Régulier érémitique,Régulier érémitique
+Statuts,Régulier - Commanderie,Régulier hospitalier,#e6550d,#e6550d,Régulier hospitalier 1,Régulier hospitalier 1
+Statuts,Régulier - Préceptorie,Régulier hospitalier,#e6550d,#e6550d,Régulier hospitalier 1,Régulier hospitalier 1
+Statuts,Régulier - Maison,Régulier hospitalier,#e6550d,#fdae6b,Régulier hospitalier 2,Régulier hospitalier 2
+Statuts,Régulier - Membre,Régulier hospitalier,#e6550d,#fdae6b,Régulier hospitalier 2,Régulier hospitalier 2
+Statuts,Régulier - Régulier indéterminé,Régulier indéterminé,#ffff33,#ffff33,Régulier indéterminé,Régulier indéterminé
+Statuts,Régulier - Couvent mendiant,Régulier mendiant,#e6ab02,#e6ab02,Régulier mendiant,Régulier mendiant
+Statuts,Régulier - Abbaye,Régulier monastique,#a50f15,#a50f15,Régulier monastique 1,Régulier monastique 1
+Statuts,Régulier - Prieuré autonome,Régulier monastique,#a50f15,#a50f15,Régulier monastique 1,Régulier monastique 1
+Statuts,Régulier - Abbaye-fille,Régulier monastique,#a50f15,#de2d26,Régulier monastique 2,Régulier monastique 2
+Statuts,Régulier - Doyenné,Régulier monastique,#a50f15,#fb6a4a,Régulier monastique 3,Régulier monastique 3
+Statuts,Régulier - Prieuré (dépendance),Régulier monastique,#a50f15,#fb6a4a,Régulier monastique 3,Régulier monastique 3
+Statuts,Régulier - Prieuré double Fontevraud,Régulier monastique,#a50f15,#fb6a4a,Régulier monastique 3,Régulier monastique 3
+Statuts,Régulier - Prieuré simple Fontevraud,Régulier monastique,#a50f15,#fb6a4a,Régulier monastique 3,Régulier monastique 3
+Statuts,Régulier - Cella,Régulier monastique,#a50f15,#fc9272,Régulier monastique 4,Régulier monastique 4
+Statuts,Régulier - Prieuré-cure,Régulier monastique,#a50f15,#fc9272,Régulier monastique 4,Régulier monastique 4
+Statuts,Régulier - Église desservie par un moine,Régulier monastique,#a50f15,#fcbba1,Régulier monastique 5,Régulier monastique 5
+Statuts,Régulier - Grange,Régulier monastique,#a50f15,#fee5d9,Régulier monastique 6,Régulier monastique 6
+Statuts,Autre - Hôpital,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Autre - Occupation funéraire,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Autre - Synagogue / Communauté juive,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Autre - Xenodochium,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Séculier - Chapelle,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Séculier - Chapelle castrale,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Séculier - Chapellenies,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Séculier - Collège,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Séculier - Église,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Séculier - Église paroissiale,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Séculier - Oratoire,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Séculier - Séminaire,Séculier,#377eb8,#377eb8,Séculier,Séculier
+Statuts,Séculier communautaire - Chapitre cathédral séculier,Séculier canonial,#8da0cb,#8da0cb,Séculier canonial,Séculier canonial
+Statuts,Séculier communautaire - Chapitre collégial séculier,Séculier canonial,#8da0cb,#8da0cb,Séculier canonial,Séculier canonial
+Statuts,Séculier communautaire - Basilique,Séculier communautaire,#984ea3,#984ea3,Séculier communautaire,Séculier communautaire
+Statuts,Séculier communautaire - Communauté de clercs,Séculier communautaire,#984ea3,#984ea3,Séculier communautaire,Séculier communautaire
+Statuts,Séculier communautaire - Communauté de prêtres,Séculier communautaire,#984ea3,#984ea3,Séculier communautaire,Séculier communautaire
+Type de communauté,Double,Double,#C797BA,#C797BA,Double,Double
+Type de communauté,Féminine,Féminine,#FFA1CF,#FFA1CF,Féminine,Féminine
+Type de communauté,Masculine,Masculine,#53CEA6,#53CEA7,Masculine,Masculine
+Relations,Déplacement d'institution,Déplacement,#6B6B6B,#6B6B6B,à supprimer car = changement de site dans disparition,
+Relations,À la collation de,hiérarchique ascendante,#2BE038,#2BE039,À la collation de,
+Relations,Appartient à,hiérarchique ascendante,#A3B1E6,#A3B1E7,Appartient à,
+Relations,Filiation ascendante directe,hiérarchique ascendante,#D498BA,#D498BA,Filiation ascendante directe,
+Relations,Filiation ascendante directe,hiérarchique asc. Ecole,#D1601D,#D1601D,Filiation ascendante directe,
+Relations,Droit de patronage,hiérarchique descendante,#105415,#105416,Droit de patronage,
+Relations,Filiation descendante,hiérarchique descendante,#921313,#921314,Filiation descendante,
+Relations,Filiation descendante,hiérarchique desc. Ecole,#6B422F,#6B422F,Filiation descendante,
+Relations,Possède,hiérarchique descendante,#2B4CCE,#2B4CCE,Possède,
+Relations,Association de prière,Relation horizontale,#E04A11,#E04A12,Association de prière,
