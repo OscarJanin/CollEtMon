@@ -18,20 +18,34 @@ dir.create(folder)
 ###################################
 #     CHANGEMENTS DE DONNEES      #
 ###################################
+moda <- "modalite"
+
 color <- "modaNiv1_Color"
 
 carac <- "caracNew"
 
-### Granularité modaniv 2 // dec 19
+### Granularité modaniv 2 // mi-dec 19
       modalite <- "modaNiv1"
-      donnee <- readRDS("Data/T0New20191202.Rds")
-
+      donnee <- readRDS("Data/T0NewChgt20191213.Rds")
+      
       Ecole <- donnee[donnee[[carac]] %in%  "École", ]
+      
+      donnee <- donnee[donnee[[carac]] %in%  c("Ordres","Statuts","Type de communauté"), ]
+      
+      CaracHist<-read.csv(file = "Data/NewModelCaracModalitesColor4.csv", header = TRUE, sep = ",", stringsAsFactors=FALSE)
+      donnee <- merge(CaracHist[,c(moda,color)], donnee, by.x=moda,by.y=moda)
+      
 
-      donnee <- donnee[donnee[[carac]] %in%  c("Observance","Ordres","Statuts","Type de communauté"), ]
-
-      CaracHist<-read.csv(file = "Data/NewModelCaracModalitesColor3.csv", header = TRUE, sep = ",", stringsAsFactors=FALSE)
-      donnee <- merge(select(CaracHist,modalite, modaNiv1_Color), donnee, by.x="modalite",by.y="modalite")
+### Granularité modaniv 2 // dec 19
+      # modalite <- "modaNiv1"
+      # donnee <- readRDS("Data/T0New20191202.Rds")
+      # 
+      # Ecole <- donnee[donnee[[carac]] %in%  "École", ]
+      # 
+      # donnee <- donnee[donnee[[carac]] %in%  c("Observance","Ordres","Statuts","Type de communauté"), ]
+      # 
+      # CaracHist<-read.csv(file = "Data/NewModelCaracModalitesColor3.csv", header = TRUE, sep = ",", stringsAsFactors=FALSE)
+      # donnee <- merge(CaracHist[,c(moda,color)], donnee, by.x=moda,by.y=moda)
 
 
 ### Granularité modaniv 2 // nov 19

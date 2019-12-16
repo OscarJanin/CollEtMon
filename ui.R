@@ -25,7 +25,7 @@ shinyUI(fluidPage(
                        height: 100vh; 
                        overflow: auto;
                        background-color:#737778;
-                       width: 15%;
+                       width: 22%;
                        float: left;
                        padding: 0px 10px;
                        overflow-wrap: break-word;
@@ -94,8 +94,8 @@ shinyUI(fluidPage(
 
                        #panelEtat{
                           bottom : 39%;
-                          right : 72%;
-                          left : 18%;
+                          right: 64%;
+                          left: 25%;
                           padding : 0 10px;
                           z-index: 1;
                           transition:all .5s;
@@ -119,11 +119,11 @@ shinyUI(fluidPage(
                           overflow-y: visible;
                        }
                        #filter.filterDisplayed {
-                          width : 15%
+                              width: 20%;
                        }
 
                        #content.filterDisplayed {
-                          width : 70%
+                          width: 58%;
                        }
 
                        #distribPlot img{
@@ -131,12 +131,12 @@ shinyUI(fluidPage(
                        }
 
                        #panelEtat.filterDisplayed{
-                          right : 59%;
-                          left : 31%;
+                          right: 46%;
+                          left: 43%;
                        }
 
                        #content{
-                            width : 82%;
+                            width : 75%;
                             float : left;
                             transition:all .5s;
                        }
@@ -255,7 +255,7 @@ shinyUI(fluidPage(
         HTML('
               <div id="distribPlot" 
                    class="shiny-plot-output" 
-                   style="width: 100% ; height: 40vh" 
+                   style="width: 100% ; height: 36vh" 
                    data-brush-id="distribPlot_brush" 
                    data-brush-fill="black" 
                    data-brush-stroke="#036" 
@@ -266,6 +266,8 @@ shinyUI(fluidPage(
                    data-brush-direction="x" 
                    data-brush-reset-on-new="FALSE">
               </div>
+              <input id="dateDebut" type="text" value="" />
+              <input id="dateFin" type="text" value="" />
              </div>')
               )
             )
