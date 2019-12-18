@@ -43,11 +43,15 @@ shinyUI(fluidPage(
                        margin: 5px;
                        }
                        .show{
-                       display: block 
+                       display: block  
                        }
                        .hide{
                        display: none !important
                        }
+                       .flex{
+                       display: flex !important
+                       }
+
                        .Toggle{
                        fill: #FB7E47;
                        cursor:pointer
@@ -62,16 +66,13 @@ shinyUI(fluidPage(
                        }
 
 
-                       #lineLegend{
+                       .Legend{
                           background-color: #ECEDE7;
-                          padding: 10px;
-                          margin: 5px;
+                          padding: 5px;
+                          margin: 0px;
+                          max-width: 75%;
                        }
-                       #ecoleLegend{
-                          background-color: #ECEDE7;
-                          padding: 10px;
-                          margin: 5px;
-                       }
+                       
 
                        #filter{
                           height: 100vh; 
@@ -146,6 +147,20 @@ shinyUI(fluidPage(
                           background-color: #FB7E47 !important
                        }
 
+                       hr{
+                         margin-top: 7px;
+                         margin-bottom: 7px;
+                         border: 0;
+                         border-top: 1px solid #5f5f5f;
+                       }
+
+                       .radio {
+                          position: relative;
+                          display: block;
+                          margin-top: 0px;
+                          margin-bottom: 5px;
+                       }
+
 
                        "
   )),
@@ -192,17 +207,18 @@ shinyUI(fluidPage(
     uiOutput("affichageUI"),
     
         HTML('
-             </div>  
-             <input type="checkbox" id="EcolR" name="École" >
+             </div> 
+             <hr>
+             <input type="checkbox" id="EcolR" class="Legend" name="École" >
              <b>École</b>
              <div id = "ecoleLegend" class = "Legend" style = " display: none;"  >
                 <svg height="10" width="10"><circle cx="5" cy="5" r="5" fill="grey" /></svg>
                 <p>École</p>
              </div> 
-             </br>
+             <hr>
               <input type="checkbox" id="RelR" name="Relations" >
               <b>Relations</b>
-              <div id = "lineLegend" class style = " display: none;"  >
+              <div id = "lineLegend" class="Legend" style = " display: none;"  >
                     <svg height="10" width="30"><line x1="0" y1="0" x2="30" y2="0" style="stroke:rgb(137,118,181);stroke-width:12" /></svg>
                     <p>A</p>
                     </br>
@@ -215,6 +231,62 @@ shinyUI(fluidPage(
                     <svg height="10" width="30"><line x1="0" y1="0" x2="30" y2="0" style="stroke:rgb(105, 88, 62);stroke-width:12" /></svg>
                     <p>X</p>
               </div>
+             <hr>
+             <input type="checkbox" id="cercles" name="Cercles proportionnels" >
+             <b>Cercles proportionnels</b>
+             <div id="prop" class="form-group shiny-input-radiogroup shiny-input-container Legend" style = " display: none;">
+                <label class="control-label" for="prop"></label>
+                <div class="shiny-options-group">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="prop" value="turb" checked="checked"/>
+                            <span>Turbulence</span>
+                        </label>
+                    </div>
+                    <div id ="legendTurb" style="display: none;" > 
+                        <div style= "display: grid; margin: 0px 10px;">
+                        <p>6<p>
+                        <svg height="35" width="35"><circle cx="15" cy="15" r="10" stroke="black" stroke-width="1" fill="none"></circle></svg>
+                        </div>
+                        <div style= "display: grid; margin: 0px 10px;">
+                        <p>4<p>
+                        <svg height="25" width="25"><circle cx="12" cy="12" r="8" stroke="black" stroke-width="1" fill="none"></circle></svg>
+                        </div>
+                        <div style= "display: grid; margin: 0px 10px;">
+                        <p>2<p>
+                        <svg height="20" width="20"><circle cx="10" cy="10" r="6" stroke="black" stroke-width="1" fill="none"></circle></svg>
+                        </div>
+                        <div style= "display: grid; margin: 0px 10px;">
+                        <p>1<p>
+                        <svg height="15" width="15"><circle cx="7" cy="7" r="5" stroke="black" stroke-width="1" fill="none"></circle></svg>
+                        </div>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="prop" value="repr"/>
+                            <span>Représentativité de l état dominant</span>
+                        </label>
+                    </div>
+                    <div id ="legendRpr" style="display: none;" > 
+                        <div style= "display: grid; margin: 0px 10px;">
+                        <p>100%<p>
+                        <svg height="35" width="35"><circle cx="15" cy="15" r="10" stroke="black" stroke-width="1" fill="none"></circle></svg>
+                        </div>
+                        <div style= "display: grid; margin: 0px 10px;">
+                        <p>75%<p>
+                        <svg height="25" width="25"><circle cx="10" cy="10" r="7" stroke="black" stroke-width="1" fill="none"></circle></svg>
+                        </div>
+                        <div style= "display: grid; margin: 0px 10px;">
+                        <p>50%<p>
+                        <svg height="15" width="15"><circle cx="7" cy="7" r="5" stroke="black" stroke-width="1" fill="none"></circle></svg>
+                        </div>
+                        <div style= "display: grid; margin: 0px 10px;">
+                        <p>25%<p>
+                        <svg height="10" width="10"><circle cx="5" cy="5" r="2.5" stroke="black" stroke-width="1" fill="none"></circle></svg>
+                        </div>
+                    </div>
+                </div>
+             </div>
          </div>
 
 <!--Main panel for displaying outputs-->
@@ -238,8 +310,14 @@ shinyUI(fluidPage(
                     </div>
                     <div class="radio">
                       <label>
-                        <input type="radio" name="etat" value="État dominant"/>
-                        <span><b>État dominant</b></span>
+                        <input type="radio" name="etat" value="État le plus long"/>
+                        <span><b>État le plus long</b></span>
+                      </label>
+                    </div>
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="etat" value="État majoritaire"/>
+                        <span><b>État majoritaire</b></span>
                       </label>
                     </div>
                   </div>

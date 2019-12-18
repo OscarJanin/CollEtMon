@@ -20,9 +20,6 @@ shinyServer(function(input, output, session) {
     
     lapply(1:length(unique(donnee[[carac]])),function(i){
       
-      
-      if(i == 1){checked = "checked"} else{checked = ""}
-      
       HTML(paste0('<input type="radio" id="',unique(donnee[[carac]])[i],'" name="conf" value="',unique(donnee[[carac]])[i],'"/>
                   <label for="',unique(donnee[[carac]])[i],'">',unique(donnee[[carac]])[i],'</label>
                   
@@ -53,51 +50,7 @@ shinyServer(function(input, output, session) {
         </div>'))
   })
     
-    
-    
-    
   })
-  
-  # output$output <-renderUI({
-  #   paste(leafletOutput("map", height = "60vh", width = "100%"),
-  #   HTML('
-  #        <div id="distribPlot" 
-  #        class="shiny-plot-output" 
-  #        style="width: 100% ; height: 40vh" 
-  #        data-brush-id="distribPlot_brush" 
-  #        data-brush-fill="black" 
-  #        data-brush-stroke="#036" 
-  #        data-brush-opacity="0.25" 
-  #        data-brush-delay="300" 
-  #        data-brush-delay-type="debounce" 
-  #        data-brush-clip="TRUE" 
-  #        data-brush-direction="x" 
-  #        data-brush-reset-on-new="FALSE">
-  #        </div>'))
-  # })
-  
-  
-  # filtrer les données par attributs
-  checkboxFilter <- function(DATA){
-    
-    req(input$conf) # si pas d'input pas de fonction (renderUI)
-    
-    listeVal <- c()
-    
-    Valor <-lapply(1:length(unique(donnee[[modalite]])),function(i){
-      
-      Value <- gsub(" ", "",unique(donnee[[modalite]])[i], fixed=T) 
-      if (input[[Value]] == TRUE) Value2 <- unique(donnee[[modalite]])[i] else Value2 <- ""
-      listeVal <- c(listeVal,Value2)
-      return(listeVal)
-    })
-    
-    currentlyFiltered <- DATA[DATA[[modalite]] %in% unlist(Valor), ]
-    # currentlyFiltered <- filter(DATA, modAgreg %in% unlist(Valor))
-    # currentlyFiltered <- filter(DATA, modaNiv2 %in% unlist(Valor))
-    
-    return(currentlyFiltered)
-  }
   
   # updateRadioButtons ----
   updateRadioButtons(session, "conf", selected = unique(donnee[[carac]])[1])
@@ -118,43 +71,106 @@ shinyServer(function(input, output, session) {
     
   })
   
+  observe({
+    toggleClass(id="legendTurb", class = "flex", condition = input$prop == "turb")
+    toggleClass(id="legendTurb", class = "hide", condition = input$prop == "repr")
+    
+    toggleClass(id="legendRpr", class = "flex", condition = input$prop == "repr")
+    toggleClass(id="legendRpr", class = "hide", condition = input$prop == "turb")
+  })
   
-  substr(unique(donnee[[carac]]),0,4)[1]
+  # filtrer les données par attributs
+  checkboxFilter <- function(DATA){
+    
+    req(input$conf) # si pas d'input pas de fonction (renderUI)
+    
+    listeVal <- c()
+    
+    Valor <-lapply(1:length(unique(donnee[[modalite]])),function(i){
+      
+      Value <- gsub(" ", "",unique(donnee[[modalite]])[i], fixed=T) 
+      if (input[[Value]] == TRUE) Value2 <- unique(donnee[[modalite]])[i] else Value2 <- ""
+      listeVal <- c(listeVal,Value2)
+      return(listeVal)
+    })
+    
+    currentlyFiltered <- DATA[DATA[[modalite]] %in% unlist(Valor), ]
+    
+    return(currentlyFiltered)
+  }
   
   #filtrer les données par les différents filtres attributaire et temporels ----
   filteredData <- reactive({
     
-    listeFiltre <- c()
+    # listeFiltre <- c()
+    # 
+    # Filtre <-lapply(1:length(unique(donnee[[carac]])),function(i){
+    #   
+    #   Value <- substr(unique(donnee[[carac]]),0,4)[i]
+    #   
+    #   listeFiltre <- c(listeFiltre,input[[Value]])
+    #   return(listeFiltre)
+    # })
+    # 
+    # T0NewSel <- filter(donnee, modalite %in% unlist(Filtre))
+    # 
+    # idImplSel <- unique(T0NewSel$idimplantation)
+    # T0NewSel <- filter(donnee, idimplantation %in% idImplSel)
     
-    Filtre <-lapply(1:length(unique(donnee[[carac]])),function(i){
-      
-      Value <- substr(unique(donnee[[carac]]),0,4)[i]
-      
-      listeFiltre <- c(listeFiltre,input[[Value]])
-      return(listeFiltre)
-    })
-    
-    T0NewSel <- filter(donnee, modalite %in% unlist(Filtre))
-    
-    idImplSel <- unique(T0NewSel$idimplantation)
-    T0NewSel <- filter(donnee, idimplantation %in% idImplSel)
-    
-    currentlyFiltered <- checkboxFilter(T0NewSel)
+    currentlyFiltered <- checkboxFilter(donnee)
     
     currentlyFiltered <- filter(currentlyFiltered, currentlyFiltered[[carac]] %in% input$conf)
+    
+    #calcul de la turbulence
+    nbFacto <- aggregate(data.frame(count = currentlyFiltered$idimplantation), list(value = currentlyFiltered$idimplantation), length)
+    colnames(nbFacto) <- c("idimplantation","Freq")
     
     if(!is.null(input$distribPlot_brush)){
       thisSel <- input$distribPlot_brush
       currentlyFiltered <- currentlyFiltered %>% 
         filter(!(date_stop_max<= thisSel$xmin | date_start_min>=thisSel$xmax))
+      
+      #calcul de la turbulence relative a la selection temporelle
+      nbFacto <- aggregate(data.frame(count = currentlyFiltered$idimplantation), list(value = currentlyFiltered$idimplantation), length)
+      colnames(nbFacto) <- c("idimplantation","Freq")
     }
+    
+    #calcul de "freq" pour les cerlces proportionnels
+    if(input$prop == "turb"){
+      currentlyFiltered <- left_join(x = currentlyFiltered, y = nbFacto, by = "idimplantation")
+    }
+    
+    if(input$prop == "repr"){
+      #additionner les durée des factoides ayant les mm modalites
+      dfDureeMax<- currentlyFiltered %>%
+        group_by(idimplantation,modaNiv1) %>%
+        summarise(DureeFactsum = sum(DureeFact))
+      
+      #selection des modalite les plus long par factoides
+      dfDureeMax <- as.data.frame(dfDureeMax %>%  group_by(idimplantation) %>% slice(which.max(DureeFactsum)))
+      names(dfDureeMax)[names(dfDureeMax) == "DureeFactsum"] <- "DureeMax"
+      
+      currentlyFiltered <- left_join(currentlyFiltered,select(dfDureeMax,idimplantation,DureeMax), by = "idimplantation")
+      
+      #calcul de la durée de l'implantation
+      DureeImpl <- currentlyFiltered %>%
+        group_by(idimplantation) %>%
+        summarise(DureeImpl = sum(DureeFact))
+      currentlyFiltered <- left_join(currentlyFiltered,DureeImpl, by = "idimplantation")
+      
+      currentlyFiltered$Freq <- as.numeric(currentlyFiltered$DureeMax/currentlyFiltered$DureeImpl)
+    } 
     
     if(input$etat == "État final"){
       T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(date_stop_max)))
     }else if(input$etat == "État initial"){
       T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(date_start_min)))
-    }else if(input$etat == "État dominant"){
+    }else if(input$etat == "État le plus long"){
       T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(DureeFact)))
+    }else if(input$etat == "État majoritaire"){
+      dfDureeMax<- currentlyFiltered %>% group_by(idimplantation,modaNiv1) %>% summarise(DureeMax = sum(DureeFact))
+      currentlyFiltered <- left_join(currentlyFiltered,select(dfDureeMax,idimplantation,DureeMax), by = "idimplantation")
+      T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(DureeMax)))
     }
     
     return(T0NewEtat)
@@ -168,11 +184,60 @@ shinyServer(function(input, output, session) {
     
     currentlyFiltered <- filter(currentlyFiltered, currentlyFiltered[[carac]] %in% input$conf)
     
+    #calcul de la turbulence
+    nbFacto <- aggregate(data.frame(count = currentlyFiltered$idimplantation), list(value = currentlyFiltered$idimplantation), length)
+    colnames(nbFacto) <- c("idimplantation","Freq")
+    
     if(!is.null(input$distribPlot_brush)){
       thisSel <- input$distribPlot_brush
       currentlyFiltered <- currentlyFiltered %>% 
-        filter((date_stop_max<= thisSel$xmin | date_start_min>=thisSel$xmax))
+        filter(date_stop_max<= thisSel$xmin | date_start_min>=thisSel$xmax)
+      
+      #calcul de la turbulence relative a la selection temporelle
+      nbFacto <- aggregate(data.frame(count = currentlyFiltered$idimplantation), list(value = currentlyFiltered$idimplantation), length)
+      colnames(nbFacto) <- c("idimplantation","Freq")
     }
+    
+    #calcul de "freq" pour les cerlces proportionnels
+    if(input$prop == "turb"){
+      currentlyFiltered <- left_join(x = currentlyFiltered, y = nbFacto, by = "idimplantation")
+    }
+    
+    if(input$prop == "repr"){
+      
+      #additionner les durée des factoides ayant les mm modalites
+      dfDureeMax<- currentlyFiltered %>%
+        group_by(idimplantation,modaNiv1) %>%
+        summarise(DureeFactsum = sum(DureeFact))
+      
+      #selection des modalite les plus long par factoides
+      dfDureeMax <- as.data.frame(dfDureeMax %>%  group_by(idimplantation) %>% slice(which.max(DureeFactsum)))
+      names(dfDureeMax)[names(dfDureeMax) == "DureeFactsum"] <- "DureeMax"
+      
+      currentlyFiltered <- left_join(currentlyFiltered,select(dfDureeMax,idimplantation,DureeMax), by = "idimplantation")
+      
+      #calcul de la durée de l'implantation
+      DureeImpl <- currentlyFiltered %>%
+        group_by(idimplantation) %>%
+        summarise(DureeImpl = sum(DureeFact))
+      currentlyFiltered <- left_join(currentlyFiltered,DureeImpl, by = "idimplantation")
+      
+      currentlyFiltered$Freq <- as.numeric(currentlyFiltered$DureeMax/currentlyFiltered$DureeImpl)
+    } 
+    
+    if(input$etat == "État final"){
+      T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(date_stop_max)))
+    }else if(input$etat == "État initial"){
+      T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(date_start_min)))
+    }else if(input$etat == "État le plus long"){
+      T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(DureeFact)))
+    }else if(input$etat == "État majoritaire"){
+      dfDureeMax<- currentlyFiltered %>% group_by(idimplantation,modaNiv1) %>% summarise(DureeMax = sum(DureeFact))
+      currentlyFiltered <- left_join(currentlyFiltered,select(dfDureeMax,idimplantation,DureeMax), by = "idimplantation")
+      T0NewEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(DureeMax)))
+    }
+    
+    return(T0NewEtat)
     
     return(currentlyFiltered)
   })
@@ -201,7 +266,7 @@ shinyServer(function(input, output, session) {
       liensCurrentlyFiltered <- Liens %>%  group_by(idimplantation) %>%  filter(date_stop_max == max(date_stop_max))
     }else if(input$etat == "État initial"){
       liensCurrentlyFiltered <- Liens %>%  group_by(idimplantation) %>%  filter(date_start_min == min(date_start_min))
-    }else if(input$etat == "État dominant"){
+    }else if(input$etat == "État le plus long"){
       liensCurrentlyFiltered <- Liens %>%  group_by(idimplantation) %>%  filter(DureeFact == max(DureeFact))
     }
     
@@ -225,7 +290,7 @@ shinyServer(function(input, output, session) {
       ecoleCurrentlyFiltered <- Ecole %>%  group_by(idimplantation) %>%  filter(date_stop_max == max(date_stop_max))
     }else if(input$etat == "État initial"){
       ecoleCurrentlyFiltered <- Ecole %>%  group_by(idimplantation) %>%  filter(date_start_min == min(date_start_min))
-    }else if(input$etat == "État dominant"){
+    }else if(input$etat == "État le plus long"){
       ecoleCurrentlyFiltered <- Ecole %>%  group_by(idimplantation) %>%  filter(DureeFact == max(DureeFact))
     }
     
@@ -311,13 +376,46 @@ shinyServer(function(input, output, session) {
   
   #Affichage factoides filtré par le graph ----
   observe({
+    
     mapData <- filteredData()
-    labelContent <- lapply(seq(nrow(mapData)), function(i) {
-      paste( "<b>Nom :</b>", mapData[i, "usual_name"], "</br>", 
-             "<b>Diocèse :</b>",mapData[i, "Diocese"], "</br>", 
-             "<b>Modalité :</b>",mapData[i, "modalite"]
-      ) 
-    })
+    
+    
+    if(input$prop=="turb" & input$cercles==T){
+      labelContent <- lapply(seq(nrow(mapData)), function(i) {
+        paste( "<b>Nom :</b>", mapData[i, "usual_name"], "</br>", 
+               "<b>Diocèse :</b>",mapData[i, "Diocese"], "</br>", 
+               "<b>Modalité :</b>",mapData[i, "modalite"], "</br>", 
+               "<b>Turbulence :</b>",mapData[i, "Freq"]
+        ) 
+      })
+      
+      radius <- mapData$Freq+5
+      show(id ='prop')
+      
+    }else if(input$prop=="repr" & input$cercles==T){
+      labelContent <- lapply(seq(nrow(mapData)), function(i) {
+        paste( "<b>Nom :</b>", mapData[i, "usual_name"], "</br>", 
+               "<b>Diocèse :</b>",mapData[i, "Diocese"], "</br>", 
+               "<b>Modalité :</b>",mapData[i, "modalite"], "</br>", 
+               "<b>% de l'état majoritaire :</b>",mapData[i, "Freq"]*100
+        ) 
+      })
+      
+      radius <- mapData$Freq*10
+      show(id ='prop')
+      
+    }else{
+      labelContent <- lapply(seq(nrow(mapData)), function(i) {
+        paste( "<b>Nom :</b>", mapData[i, "usual_name"], "</br>", 
+               "<b>Diocèse :</b>",mapData[i, "Diocese"], "</br>", 
+               "<b>Modalité :</b>",mapData[i, "modalite"]
+        ) 
+      })
+      
+      radius <- 5
+      hide(id ='prop')
+    }
+    
     mapProxy <- leafletProxy("map", session = session)
     mapProxy %>%
       clearGroup('reactive') %>% 
@@ -326,7 +424,7 @@ shinyServer(function(input, output, session) {
         data = mapData,
         lat = ~lat,
         lng = ~lng,
-        radius = 5,
+        radius = ~radius,
         color = 'white',
         opacity = 1,
         fillColor = ~mapData[[color]],
@@ -347,8 +445,15 @@ shinyServer(function(input, output, session) {
       paste( "<b>Nom :</b>", trspData[i, "usual_name"], "</br>", 
              "<b>Diocèse :</b>",trspData[i, "Diocese"], "</br>", 
              "<b>Modalité :</b>",trspData[i, "modalite"]
-      ) 
+      )
     })
+    
+    if(input$cercles==T){
+      radius <- ~trspData$Freq
+    }else{
+      radius <- 5
+    }
+    
     mapProxy <- leafletProxy("map", session = session, data = trspData)
     mapProxy %>%
       clearGroup('trsp')%>%
@@ -356,7 +461,7 @@ shinyServer(function(input, output, session) {
         layerId=~idimplantation,
         lat = ~lat,
         lng = ~lng,
-        radius = 5,
+        radius = radius,
         color = 'white',
         opacity = 1,
         fillColor = ~trspData[[color]],
@@ -495,8 +600,12 @@ shinyServer(function(input, output, session) {
       nbEtat <- as.data.frame(nbConf %>%  group_by(idimplantation) %>%  slice(which.max(date_stop_max)))
     }else if(input$etat == "État initial"){
       nbEtat <- as.data.frame(nbConf %>%  group_by(idimplantation) %>%  slice(which.max(date_start_min)))
-    }else if(input$etat == "État dominant"){
+    }else if(input$etat == "État le plus long"){
       nbEtat <- as.data.frame(nbConf %>%  group_by(idimplantation) %>%  slice(which.max(DureeFact)))
+    }else if(input$etat == "État majoritaire"){
+      dfDureeMax<- currentlyFiltered %>% group_by(idimplantation,modaNiv1) %>% summarise(DureeMax = sum(DureeFact))
+      currentlyFiltered <- left_join(currentlyFiltered,select(dfDureeMax,idimplantation,DureeMax), by = "idimplantation")
+      nbEtat <- as.data.frame(currentlyFiltered %>%  group_by(idimplantation) %>%  slice(which.max(DureeMax)))
     }
     
     
